@@ -1,0 +1,237 @@
+/* SPL Tools Framework HTML output CSS file. */
+H1 {
+  margin-top: 0px;
+}
+H1,H2,H3,H4,H5 {
+  color: #2C395C;
+  border-bottom: 1px dotted #2C395C;
+}
+BODY {
+  text-align: justify;
+}
+P, TABLE {
+  font-size: 110%;
+}
+#wrap {
+  margin: auto;
+  text-align: left;
+  padding: 147px 0px 0px 0px;
+  width: 900px;
+  background: white url("top.png") no-repeat 0 0;
+  border: 1px solid #2C395C;
+}
+#no-wrap {
+  background-color: white;
+  min-width: 400px;
+}
+#main {
+  padding: 4px;
+}
+#breadcrumb {
+  font-size: 80%;
+  padding: 0px 1em 2px 0;
+  text-align: right;
+  border-bottom: 1px solid #2C395C;
+}
+#footer {
+  margin: 0;
+  background:
+  #2C395C;
+  color: white;
+  font-size: 60%;
+  padding: 3px 3px;
+  text-align: right;
+}
+.configuration-page .section {
+  padding-bottom: 10px;
+  margin-bottom: 25px;
+/*  border-bottom: 1px solid #2C395C;*/
+}
+
+TABLE {
+  border-collapse: collapse;
+  border: 1px solid #2C395C;
+  max-width: 900px;
+}
+TABLE TH,
+TABLE TD {
+  padding: 4px;
+  border: 1px solid black;
+}
+
+.measurement-detail-table,
+.project-details-table,
+.revisions-table,
+.parameters-table,
+.overview-summary-table,
+.measurement-error,
+.summary-data, 
+.suspicious-measurements-table {
+	width: 100%;
+}
+.overview-summary-table {
+  border-width: 2px;
+}
+.overview-summary-table .value,
+.suspicious-measurements-table .value,
+.summary-data .value,
+.statistical-data .value {
+  text-align: right;
+}
+.overview-summary-table .package-row td {
+  font-size: 120%;
+  font-weight: bold;
+  border-top-width: 2px;
+}
+.overview-summary-table .class-row td {
+  font-weight: bold;
+  border-bottom-style: none;
+}
+.overview-summary-table .annotation-row td {
+  border-top-style: dotted;
+  border-top-width: 1px;
+  border-bottom-style: none;
+  border-bottom-width: 0px;
+}
+
+.statistical-data{
+	min-width: 400px;
+	max-width: 900px;
+}
+.statistical-data .key,
+.measurement-detail-table .key {
+	text-align: left;
+}
+TABLE TR .key, TABLE TR .value {
+  min-width: 50px;
+}
+.revisions-table TR .value {
+  min-width: 25px;
+}
+.revisions-table .col2 {
+  font-family: 'Courier New', Courier, 'Andale Mono', monospace;
+  font-size: 80%;
+}
+.revisions-table .col3,
+.revisions-table .col4,
+.revisions-table .col5 {
+  text-align: right;
+  padding-right: 10px;
+}
+.suspicious-measurements-table .col1,
+.suspicious-measurements-table .col6,
+.suspicious-measurements-table .col8 {
+  border-right-style: none;
+}
+.suspicious-measurements-table .col2,
+.suspicious-measurements-table .col7,
+.suspicious-measurements-table .col9{
+  border-left-style: none;
+  max-width: 20px;
+  min-width: 0px;
+  text-align: center;
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+
+.suspicious-measurements-table .unit {
+  font-size: 80%;
+}
+
+TABLE TR TH {
+  text-align: center;
+}
+TABLE .key,
+.comparison-samples-statistical-data TH TD {
+	font-weight: bold;
+}
+.comparison-samples-statistical-data {
+	min-width: 600px;
+
+}
+
+.measurement-statistical-data {
+
+}
+.comparison-statistical-data {
+
+}
+.error {
+	color: red;
+}
+.warning {
+	color: rgb(255,127,39);
+}
+
+.section {
+  
+}
+.toggleSection {
+  overflow: hidden;
+}
+.toggleSectionTitle {
+  border-bottom: 1px dotted #2C395C;
+}
+.toggleSectionTitle H1, .toggleSectionTitle H2, 
+.toggleSectionTitle H3, .toggleSectionTitle H4, 
+.toggleSectionTitle H5 {
+  display: inline;
+  border-bottom: 0 none black;
+}
+.toggleSectionTitle P {
+  display: inline;
+  font-size: 90%;
+}
+.toggleSectionTitle HR {
+  display: none;
+  clear: both;
+}
+.parsed-declaration{
+  word-wrap: break-word;
+}
+.declaration-image {
+  word-wrap: break-word;
+  font-size: 105%;
+}
+.ul-drift {
+  margin-left: -32px;/* 16px is size of icons */
+}
+.formula-root, .operands,
+.comparison-detail, .declarations,
+.annotations-root, .class-detail,
+.method-detail, .content-list {
+  list-style-type: none;
+}
+.measurement-tree {
+  /*list-style-image: url(show-detail.png);*/
+}
+.formula-root, .comparison-detail, 
+.logical-operation, .comparison, 
+.measurement, .annotations-root,
+.evaluated-formulas-root, .not-parsed-formulas {
+  font-size: 110%;
+  word-wrap: break-word;
+}
+.logical-operation {
+  font-weight: bold;
+} 
+.annotations-root .package,
+.annotations-root .class,
+.annotation-location-signature {
+  font-family: 'Courier New', Courier, 'Andale Mono', monospace;
+}
+.annotations-root .method .satisfied {
+  color: green;
+  font-style: italic;
+}
+.annotations-root .method .failed {
+  color: red;
+  font-style: italic;
+}
+.annotations-root .method .warning {
+  font-style: italic;
+}
+.graph {
+  max-width: 900px;
+  text-align: center;
+}

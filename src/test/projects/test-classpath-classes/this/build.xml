@@ -1,0 +1,31 @@
+<project name="" default="distribution" basedir=".">
+    <description>
+    </description>
+    
+    <property name="source" location="source"/> 
+    <property name="source-private" location="source-private"/>
+    <property name="build" location="build"/>
+    <property name="distribution"  location="distribution"/>
+
+    <target name="initialization">
+        <tstamp/>
+        <mkdir dir="${build}"/>
+    </target>
+
+    <target name="compilation" depends="initialization">
+	    <javac destdir="${build}">
+ 		<src path="${source}"/>  
+            	<src path="${source-private}"/>  
+	    </javac>
+    </target>
+
+    <target name="distribution" depends="compilation">
+        <mkdir dir="${distribution}/"/>
+        <jar jarfile="${distribution}/distribution.jar" basedir="${build}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build}"/>
+        <delete dir="${distribution}"/>
+    </target>
+</project>

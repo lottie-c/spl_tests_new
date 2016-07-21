@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mapping for configuration objects in cz.cuni.mff.spl.configuration.** -->
+<!-- @author Jiri Daniel -->
+<!-- @author Martin Lacina -->
+<mapping>
+
+	<class name="cz.cuni.mff.spl.configuration.ConfigurationBundle">
+		<map-to xml="" />
+		<field name="deploymentConfig"
+			type="cz.cuni.mff.spl.configuration.SplDeploymentConfiguration">
+			<bind-xml name="deployment-configuration" node="element" />
+		</field>
+		<field name="evaluatorConfig"
+			type="cz.cuni.mff.spl.configuration.SplEvaluatorConfiguration">
+			<bind-xml name="evaluation-configuration" node="element" />
+		</field>
+	</class>
+
+	<class name="cz.cuni.mff.spl.configuration.SplDeploymentConfiguration">
+		<map-to xml="measurement-configuration" />
+		<field name="useSystemShell" type="boolean">
+			<bind-xml name="use-system-shell" node="attribute" />
+		</field>
+		<field name="samplerArguments" type="java.lang.String">
+			<bind-xml name="sampler-jvm-arguments" node="attribute" />
+		</field>
+		<field name="warmupCycles" type="int">
+			<bind-xml name="warmup-cycles" node="attribute" />
+		</field>
+		<field name="timeSource" type="java.lang.String">
+			<bind-xml name="time-source" node="attribute" />
+		</field>
+		<field name="warmupTime" type="int">
+			<bind-xml name="warmup-time" node="attribute" />
+		</field>
+		<field name="measurementCycles" type="int">
+			<bind-xml name="measurement-cycles" node="attribute" />
+		</field>
+		<field name="measurementTime" type="int">
+			<bind-xml name="measurement-time" node="attribute" />
+		</field>
+		<field name="timeout" type="int">
+			<bind-xml name="timeout" node="attribute" />
+		</field>
+		<field name="clearTmpBefore" type="boolean">
+			<bind-xml name="clear-tmp-before" node="attribute" />
+		</field>
+		<field name="clearTmpAfter" type="boolean">
+			<bind-xml name="clear-tmp-after" node="attribute" />
+		</field>
+	</class>
+
+	<class name="cz.cuni.mff.spl.configuration.SplEvaluatorConfiguration">
+		<map-to xml="evaluator-configuration" />
+		<field name="generateHtmlOutput" type="boolean">
+			<bind-xml name="generate-html-output" node="attribute" location="evaluator.output" />
+		</field>
+		<field name="generateGraphOutput" type="boolean">
+			<bind-xml name="generate-graph-output" node="attribute" location="evaluator.output"/>
+		</field>
+		<field name="generateXmlOutput" type="boolean">
+			<bind-xml name="generate-xml-output" node="attribute" location="evaluator.output"/>
+		</field>
+		<field name="TTestLimitPValue" type="double">
+			<bind-xml name="t-test-limit-p-value" node="attribute" location="evaluator.statistics" />
+		</field>
+		<field name="equalityInterval" type="double">
+			<bind-xml name="default-equality-interval" node="attribute" location="evaluator.statistics" />
+		</field>
+		<field name="maximumStandardDeviationVsMeanDifferenceWarningLimit"
+			type="double">
+			<bind-xml
+				name="maximum-standard-deviation-vs-mean-difference-warning-limit"
+				node="attribute" location="evaluator.statistics" />
+		</field>
+		<field name="maximumMedianVsMeanDifferenceWarningLimit" type="double">
+			<bind-xml name="maximum-median-vs-mean-difference-warning-limit"
+				node="attribute" location="evaluator.statistics" />
+		</field>
+		<field name="minimumSampleCountWarningLimit" type="long">
+			<bind-xml name="minimum-sample-count-warning-limit" node="attribute" location="evaluator.statistics" />
+		</field>
+		<field name="RScriptCommand" type="java.lang.String">
+			<bind-xml name="rscript-command" node="attribute" location="evaluator.graphs" />
+		</field>
+		<field name="histogramMaximumBinCount" type="int">
+			<bind-xml name="histogram-maximum-bin-count" node="attribute" location="evaluator.graphs"/>
+		</field>
+		<field name="histogramMinimumBinCount" type="int">
+			<bind-xml name="histogram-minimum-bin-count" node="attribute" location="evaluator.graphs"/>
+		</field>
+		<field name="graphMaximumNormalDensityYAxisLimit" type="double">
+			<bind-xml name="graph-maximum-normal-density-y-axis-limit"
+				node="attribute" location="evaluator.graphs"/>
+		</field>
+		<field name="graphImageHeight" type="int">
+			<bind-xml name="graph-image-height" node="attribute" location="evaluator.graphs"/>
+		</field>
+		<field name="graphImageWidth" type="int">
+			<bind-xml name="graph-image-width" node="attribute" location="evaluator.graphs"/>
+		</field>
+		<field name="graphBackgroundColor" type="java.awt.Color">
+			<bind-xml name="background-color" node="element" location="evaluator.graphs.colors" />
+		</field>
+		<field name="graphBackgroundTransparent" type="boolean">
+			<bind-xml name="background-transparent" node="attribute" location="evaluator.graphs.colors" />
+		</field>
+		<field name="graphTextColor" type="java.awt.Color">
+			<bind-xml name="text-color" node="element"  location="evaluator.graphs.colors" />
+		</field>
+		<field name="graphSampleColors" type="java.awt.Color"
+			collection="arraylist">
+			<bind-xml name="sample-color" node="element"  location="evaluator.graphs.colors" />
+		</field>
+		<field name="measurementGraphTypes" type="cz.cuni.mff.spl.evaluator.graphs.GraphDefinition"
+			collection="arraylist">
+			<bind-xml name="graph" node="element" location="evaluator.graphs.measurement" />
+		</field>
+		<field name="comparisonGraphTypes" type="cz.cuni.mff.spl.evaluator.graphs.GraphDefinition"
+			collection="arraylist">
+			<bind-xml name="graph" node="element" location="evaluator.graphs.comparison" />
+		</field>
+	</class>
+
+	<class name="java.awt.Color" verify-constructable="false">
+		<field name="red" set-method="%1" get-method="getRed" type="int">
+			<bind-xml name="red" node="attribute" />
+		</field>
+		<field name="green" set-method="%2" get-method="getGreen" type="int">
+			<bind-xml name="green" node="attribute" />
+		</field>
+		<field name="blue" set-method="%3" get-method="getBlue" type="int">
+			<bind-xml name="blue" node="attribute" />
+		</field>
+		<field name="alpha" set-method="%4" get-method="getAlpha" type="int">
+			<bind-xml name="alpha" node="attribute" />
+		</field>
+	</class>
+
+	<class name="cz.cuni.mff.spl.evaluator.graphs.GraphDefinition"
+		identity="id">
+		<map-to xml="graph" />
+		<field name="id" type="java.lang.String">
+			<bind-xml name="gdid" node="attribute" type="ID" />
+		</field>
+		<field name="parserString" type="java.lang.String">
+			<bind-xml name="type" node="attribute" type="java.lang.String" />
+		</field>
+	</class>
+</mapping>

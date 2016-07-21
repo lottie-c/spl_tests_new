@@ -1,0 +1,256 @@
+<class-diagram version="1.0.11" icons="true" automaticImage="PNG" always-add-relationships="false" 
+  generalizations="true" realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="cz.cuni.mff.spl.annotation.AnnotationLocation" 
+    project="project" file="/project/src/java/cz/cuni/mff/spl/annotation/AnnotationLocation.java" binary="false">    
+    <position height="-1" width="-1" x="738" y="122"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="2" corner="BOTTOM_RIGHT" language="java" name="cz.cuni.mff.spl.annotation.FormulaDeclaration" 
+    project="project" file="/project/src/java/cz/cuni/mff/spl/annotation/FormulaDeclaration.java" binary="false">    
+    <position height="-1" width="-1" x="508" y="208"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="3" corner="BOTTOM_RIGHT" language="java" name="cz.cuni.mff.spl.annotation.ParsedDeclaration" 
+    project="project" file="/project/src/java/cz/cuni/mff/spl/annotation/ParsedDeclaration.java" binary="false">    
+    <position height="-1" width="-1" x="405" y="84"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="cz.cuni.mff.spl.annotation.GeneratorAliasDeclaration" 
+    project="project" file="/project/src/java/cz/cuni/mff/spl/annotation/GeneratorAliasDeclaration.java" binary="false">    
+    <position height="-1" width="-1" x="245" y="335"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="cz.cuni.mff.spl.annotation.ParsedAliasDeclaration" 
+    project="project" file="/project/src/java/cz/cuni/mff/spl/annotation/ParsedAliasDeclaration.java" binary="false">    
+    <position height="-1" width="-1" x="308" y="219"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="cz.cuni.mff.spl.annotation.MethodAliasDeclaration" 
+    project="project" file="/project/src/java/cz/cuni/mff/spl/annotation/MethodAliasDeclaration.java" binary="false">    
+    <position height="-1" width="-1" x="442" y="334"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="cz.cuni.mff.spl.annotation.Info" project="project" 
+    file="/project/src/java/cz/cuni/mff/spl/annotation/Info.java" binary="false">    
+    <position height="-1" width="-1" x="96" y="65"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="cz.cuni.mff.spl.annotation.Project" project="project" 
+    file="/project/src/java/cz/cuni/mff/spl/annotation/Project.java" binary="false">    
+    <position height="-1" width="-1" x="73" y="310"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="9" corner="BOTTOM_RIGHT" language="java" name="cz.cuni.mff.spl.annotation.Build" project="project" 
+    file="/project/src/java/cz/cuni/mff/spl/annotation/Build.java" binary="false">    
+    <position height="-1" width="-1" x="247" y="480"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="10" corner="BOTTOM_RIGHT" language="java" name="cz.cuni.mff.spl.annotation.Repository" project="project" 
+    file="/project/src/java/cz/cuni/mff/spl/annotation/Repository.java" binary="false">    
+    <position height="-1" width="-1" x="72" y="494"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="11" corner="BOTTOM_RIGHT" language="java" name="cz.cuni.mff.spl.annotation.Revision" project="project" 
+    file="/project/src/java/cz/cuni/mff/spl/annotation/Revision.java" binary="false">    
+    <position height="-1" width="-1" x="82" y="635"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <generalization id="12">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <association id="13">    
+    <bendpoint x="591" y="394"/>    
+    <bendpoint x="362" y="392"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="14" name="generators"/>      
+      <multiplicity id="15" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="16">    
+    <bendpoint x="167" y="135"/>    
+    <bendpoint x="168" y="231"/>    
+    <bendpoint x="169" y="285"/>    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="17" name="globalGenerators">        
+        <position height="15" width="90" x="114" y="160"/>      
+      </attribute>      
+      <multiplicity id="18" minimum="0" maximum="2147483647">        
+        <position height="15" width="19" x="158" y="177"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="19">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="20" name="thisProject">        
+        <position height="15" width="57" x="76" y="188"/>      
+      </attribute>      
+      <multiplicity id="21" minimum="0" maximum="1">        
+        <position height="15" width="21" x="93" y="206"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="22">    
+    <bendpoint x="225" y="8"/>    
+    <bendpoint x="399" y="8"/>    
+    <bendpoint x="600" y="9"/>    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="23" name="annotationLocations">        
+        <position height="15" width="104" x="513" y="265"/>      
+      </attribute>      
+      <multiplicity id="24" minimum="0" maximum="2147483647">        
+        <position height="15" width="19" x="541" y="244"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="25">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="5"/>  
+  </generalization>  
+  <association id="26">    
+    <bendpoint x="211" y="148"/>    
+    <bendpoint x="211" y="266"/>    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="27" name="globalMethods">        
+        <position height="15" width="76" x="189" y="132"/>      
+      </attribute>      
+      <multiplicity id="28" minimum="0" maximum="2147483647">        
+        <position height="15" width="19" x="218" y="151"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="29">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="30" name="annotationLocation"/>      
+      <multiplicity id="31" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="32">    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="33" name="revisions"/>      
+      <multiplicity id="34" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="35">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="36" name="methods"/>      
+      <multiplicity id="37" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="38">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="5"/>  
+  </generalization>  
+  <association id="39">    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="40" name="repository"/>      
+      <multiplicity id="41" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="42">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <association id="43">    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="44" name="repository"/>      
+      <multiplicity id="45" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="46">    
+    <bendpoint x="141" y="372"/>    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="47" name="build"/>      
+      <multiplicity id="48" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="9" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="49">    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="50" name="project"/>      
+      <multiplicity id="51" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="52">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="53" name="formulas"/>      
+      <multiplicity id="54" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="2" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="55">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="56" name="projects">        
+        <position height="15" width="46" x="8" y="178"/>      
+      </attribute>      
+      <multiplicity id="57" minimum="0" maximum="2147483647">        
+        <position height="15" width="19" x="27" y="199"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="false" package="false" protected="false" private="false"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

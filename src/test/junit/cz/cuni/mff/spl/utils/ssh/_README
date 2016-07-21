@@ -1,0 +1,5 @@
+To actually run these tests remove "template" from template file names and fill in values.
+
+Private keys with and without passphrase are required. A host file with already set public key is required also. 
+
+All private files should be named with suffix ".sshtest" listed in .gitignore file.

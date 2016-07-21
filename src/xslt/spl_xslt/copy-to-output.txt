@@ -1,0 +1,23 @@
+#Each line not starting with character # is name of file to copy to 
+#HTML output directory.
+main.css
+sorttable.js
+build_failed.png
+class.png
+configure.png
+evaluate_failed.png
+evaluate_processed.png
+package.png
+parameters.png
+project.png
+result_error.png
+result_failed.png
+result_ok.png
+result_warning.png
+revisions.png
+show-detail.png
+spl.png
+sum.png
+tooltip.png
+top.png
+unknown.png

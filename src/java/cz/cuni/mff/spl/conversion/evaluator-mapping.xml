@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mapping for evaluator objects in cz.cuni.mff.spl.evaluator.** -->
+<!-- @author Jiri Daniel -->
+<!-- @author Martin Lacina -->
+<mapping>
+ 	
+    <class name="cz.cuni.mff.spl.evaluator.output.results.ComparisonResult">
+        <map-to xml="comparison-result"/>
+        <field name="pValue" type="java.lang.Double">
+        	<bind-xml name="pValue" node="attribute"/>
+        </field>
+        <field name="statisticalResult" type="cz.cuni.mff.spl.evaluator.output.results.StatisticalResult">
+        	<bind-xml name="result" node="attribute" type="java.lang.String" />
+        </field>
+        <field name="errorMessage" type="java.lang.String">
+        	<bind-xml name="error-message" node="element"/>
+        </field>
+    </class>
+    
+ 	<class name="cz.cuni.mff.spl.evaluator.output.results.LogicalOperationEvaluationResult" extends="cz.cuni.mff.spl.evaluator.output.EvaluationResult">
+        <map-to xml="logical-operation-result"/>
+        <field name="evaluatedLogicalOperation" type="cz.cuni.mff.spl.annotation.Expression">
+        	<bind-xml name="fref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="logicalOperator" type="cz.cuni.mff.spl.annotation.Operator">
+        	<bind-xml name="logicalOperator" node="attribute" type="java.lang.String" />
+        </field>
+        <field name="leftOperandResult"  type="cz.cuni.mff.spl.evaluator.output.results.EvaluationResult">
+        	<bind-xml auto-naming="deriveByClass" node="element" location="leftOperandResult"/>
+        </field>
+        <field name="rightOperandResult" type="cz.cuni.mff.spl.evaluator.output.results.EvaluationResult">
+        	<bind-xml auto-naming="deriveByClass" node="element" location="rightOperandResult"/>
+        </field>
+        <field name="statisticalResult" type="cz.cuni.mff.spl.evaluator.output.results.StatisticalResult">
+        	<bind-xml name="result" node="attribute" type="java.lang.String" />
+        </field>
+    </class>
+    
+    <class name="cz.cuni.mff.spl.evaluator.output.results.FormulaEvaluationResult" extends="cz.cuni.mff.spl.evaluator.output.EvaluationResult">
+        <map-to xml="formula-result"/>
+        <field name="formulaDeclaration" type="cz.cuni.mff.spl.annotation.FormulaDeclaration">
+        	<bind-xml name="pdref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="formulaEvaluationResultRoot" type="cz.cuni.mff.spl.evaluator.output.results.EvaluationResult">
+        	<bind-xml auto-naming="deriveByClass" node="element"/>
+        </field>
+        <field name="statisticalResult" type="cz.cuni.mff.spl.evaluator.output.results.StatisticalResult">
+        	<bind-xml name="result" node="attribute" type="java.lang.String" />
+        </field>
+    </class>
+
+ 	<class name="cz.cuni.mff.spl.evaluator.output.results.ComparisonEvaluationResult" extends="cz.cuni.mff.spl.evaluator.output.EvaluationResult" identity="id">
+        <map-to xml="comparison-evaluation-result"/>
+        <field name="id" type="java.lang.String">
+            <bind-xml name="compid" node="attribute" type="ID" />
+        </field>
+        <field name="comparison" type="cz.cuni.mff.spl.annotation.Comparison">
+        	<bind-xml name="fref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="leftMeasurementSample" type="cz.cuni.mff.spl.evaluator.statistics.MeasurementSample">
+        	<bind-xml name="left-measurement-sample-ref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="rightMeasurementSample" type="cz.cuni.mff.spl.evaluator.statistics.MeasurementSample">
+        	<bind-xml name="right-measurement-sample-ref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="comparisonResult" type="cz.cuni.mff.spl.evaluator.output.results.ComparisonResult">
+        	<bind-xml auto-naming="deriveByClass" node="element"/>
+        </field>        
+    </class>
+
+ 	<class name="cz.cuni.mff.spl.evaluator.statistics.MeasurementSample" identity="id">
+        <map-to xml="measurement-sample"/>
+        <field name="id" type="java.lang.String">
+            <bind-xml name="msampleid" node="attribute" type="ID" />
+        </field>
+        <field name="measurement" type="cz.cuni.mff.spl.annotation.Measurement">
+        	<bind-xml name="msref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="statisticalData" type="cz.cuni.mff.spl.evaluator.statistics.MeasurementSampleStatisticalData">
+        	<bind-xml name="sampleStatistics" node="element"/>
+        </field>        
+    </class>
+
+ 	<class name="cz.cuni.mff.spl.evaluator.statistics.MeasurementSampleStatisticalData">
+        <map-to xml="sample-statistics"/>
+    	<field name="sampleCount" type="java.lang.Long">
+        	<bind-xml name="sampleCount" node="attribute"/>
+        </field>
+    	<field name="warmupCount" type="java.lang.Long">
+        	<bind-xml name="warmupCount" node="attribute"/>
+        </field>
+    	<field name="measuredDate" type="java.lang.String">
+        	<bind-xml name="measuredDate" node="attribute"/>
+        </field>
+        <field name="standardDeviation" type="java.lang.Double">
+        	<bind-xml name="standardDeviation" node="attribute"/>
+        </field>
+    	<field name="mean" type="java.lang.Double">
+        	<bind-xml name="mean" node="attribute"/>
+        </field>
+    	<field name="median" type="java.lang.Double">
+        	<bind-xml name="median" node="attribute"/>
+        </field>
+    	<field name="minimum" type="java.lang.Double">
+        	<bind-xml name="minimum" node="attribute"/>
+        </field>
+    	<field name="maximum" type="java.lang.Double">
+        	<bind-xml name="maximum" node="attribute"/>
+        </field>              
+    </class>
+    
+ 	<class name="cz.cuni.mff.spl.evaluator.output.impl.xml.MeasurementGraphReference">
+        <map-to xml="measurement-graph"/>
+        <field name="measurement" type="cz.cuni.mff.spl.annotation.Measurement">
+        	<bind-xml name="msref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="graphType" type="cz.cuni.mff.spl.evaluator.graphs.GraphDefinition">
+        	<bind-xml name="gdref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="graphFileName" type="java.lang.String">
+        	<bind-xml name="file" node="attribute" />
+        </field>
+    </class>
+
+ 	<class name="cz.cuni.mff.spl.evaluator.output.impl.xml.ComparisonGraphReference">
+        <map-to xml="comparison-graph"/>
+        <field name="comparison" type="cz.cuni.mff.spl.evaluator.output.results.ComparisonEvaluationResult">
+        	<bind-xml name="compref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="graphType" type="cz.cuni.mff.spl.evaluator.graphs.GraphDefinition">
+        	<bind-xml name="gdref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="graphFileName" type="java.lang.String">
+        	<bind-xml name="file" node="attribute" />
+        </field>
+    </class>
+
+	<class name="cz.cuni.mff.spl.evaluator.output.results.AnnotationEvaluationResult" identity="id">
+        <map-to xml="annotation-evaluation-result"/>
+        <field name="id" type="java.lang.String">
+            <bind-xml name="arid" node="attribute" type="ID" />
+        </field>
+        <field name="annotationLocation" type="cz.cuni.mff.spl.annotation.AnnotationLocation">
+        	<bind-xml name="aref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        
+        <field name="formulaEvaluationResults" type="cz.cuni.mff.spl.evaluator.output.results.FormulaEvaluationResult"
+               collection="set" set-method="addFormulaEvaluationResult" get-method="getFormulaEvaluationResults">
+            <bind-xml auto-naming="deriveByClass" node="element" location="formula-evaluation-results"/>
+        </field>
+	</class>
+
+	<class name="cz.cuni.mff.spl.evaluator.output.results.ResultData">
+        <map-to xml="spl-result"/>
+        
+        <field name="configuration" type="cz.cuni.mff.spl.configuration.ConfigurationBundle">
+        	<bind-xml name="configuration" node="element" />
+        </field>
+        
+        <field name="info" type="cz.cuni.mff.spl.annotation.Info">
+        	<bind-xml name="info" node="element"/>
+        </field>
+        
+        <field name="annotationEvaluationResults" type="cz.cuni.mff.spl.evaluator.output.results.AnnotationEvaluationResult"
+               collection="set">
+            <bind-xml auto-naming="deriveByClass" node="element" location="annotation-evaluation-results"/>
+        </field>
+        
+        <field name="measurementSamples" type="cz.cuni.mff.spl.evaluator.statistics.MeasurementSample"
+               collection="set">
+            <bind-xml auto-naming="deriveByClass" node="element" location="measurement-samples"/>
+        </field>
+        
+        <field name="measurementGraphs" type="cz.cuni.mff.spl.evaluator.output.impl.xml.MeasurementGraphReference"
+               collection="map" set-method="addMeasurementGraphReference" get-method="getMeasurementGraphs">
+            <bind-xml auto-naming="deriveByClass" node="element" location="measurement-graphs"/>
+        </field>
+
+        <field name="comparisonGraphs" type="cz.cuni.mff.spl.evaluator.output.impl.xml.ComparisonGraphReference"
+               collection="map" set-method="addComparisonGraphReference" get-method="getComparisonGraphs">
+            <bind-xml auto-naming="deriveByClass" node="element" location="comparison-graphs"/>
+        </field>
+        
+        
+        
+ 	</class>
+ 	
+</mapping>

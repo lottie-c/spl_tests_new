@@ -1,0 +1,4 @@
+url= ssh://...
+username=
+keyPath= name of the key in this package, NOT passphrase protected
+trustAll=false

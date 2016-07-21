@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @author Martin Lacina -->
+<mapping>
+        
+	<!-- mapping for basic objects in cz.cuni.mff.spl.annotation.** -->
+	<include href="annotation-mapping.xml"/>
+
+	<!-- mapping for evaluator objects in cz.cuni.mff.spl.evaluator.** -->
+	<include href="evaluator-mapping.xml"/>
+
+    <!-- mapping for configuration objects in cz.cuni.mff.spl.configuration.** -->
+    <include href="configuration-mapping.xml"/>
+    
+    <!-- mapping for HTML output classes for XSLT -->
+    <include href="html-output-mapping.xml" />
+</mapping>

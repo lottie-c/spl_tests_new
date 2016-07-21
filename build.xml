@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." name="spl-tools-code" default="main">
+	<property name="version" value="1.0" />
+
+	<property name="src.dir" value="src" />
+	<property name="xslt.src.dir" value="${src.dir}/xslt" />
+	<property name="java.src.dir" value="${src.dir}/java" />
+	<property name="junit.src.dir" value="${src.dir}/test/junit" />
+	<property name="junit.othercp.src.dir" value="${src.dir}/test/junit-othercp" />
+	
+	<property name="lib.dir" value="lib" />
+	
+	<property name="build.dir" value="build" />
+	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="classes.othercp.dir" value="${build.dir}/classes-othercp" />
+	<property name="javadoc.dir" value="${build.dir}/javadoc" />
+	<property name="junit.reports.dir" value="${build.dir}/report" />	
+	<property name="jar.dir" value="${build.dir}/jar" />
+	<property name="jar.name" value="SPL.jar" />
+	<property name="jar-xslt.name" value="SPL-xslt-resources.jar" />
+	<property name="tool.dir" value="tools" />
+	<property name="dist.dir" value="${build.dir}/dist" />
+	<property name="src.dist.dir" value="${build.dir}/src-dist" />
+	<property name="zip.dist.dir" value="${build.dir}/zip-dist" />
+	<property name="zip.dist.name" value="spl-${version}.zip" />
+	<property name="source.dist.name" value="spl-src-${version}" />
+	
+	<property name="examples.dir" value="${build.dir}/examples" />
+	<property name="case-study.dir" value="${examples.dir}/case-study" />
+	
+	<property name="parsers.src.dir" value="${java.src.dir}/cz/cuni/mff/spl/formula/parser" />
+	<property name="parsers.out.dir" value="${java.src.dir}/cz/cuni/mff/spl/formula/parser" />
+
+	<property name="utilsparsers.src.dir" value="${java.src.dir}/cz/cuni/mff/spl/utils/parsers" />
+	<property name="utilsparsers.out.dir" value="${java.src.dir}/cz/cuni/mff/spl/utils/parsers" />
+	
+	<property name="javacc.args" value="" />
+	
+	<condition property="uptodate.mainparser">
+		<and>
+			<uptodate
+				targetfile="${parsers.out.dir}/Parser.java"
+				srcfile="${parsers.src.dir}/Parser.jj" />
+			<available file="${parsers.out.dir}/Parser.java" />
+		</and>
+	</condition>
+
+	<condition property="uptodate.utilparsers.graphdefinition">
+		<and>
+			<uptodate
+				targetfile="${utilsparsers.src.dir}/GraphDefinitionParser.java"
+				srcfile="${utilsparsers.src.dir}/GraphDefinitionParser.jj" />
+			<available file="${utilsparsers.src.dir}/GraphDefinitionParser.java" />
+		</and>
+	</condition>
+	
+	<condition property="uptodate.utilparsers.color">
+		<and>
+			<uptodate
+				targetfile="${utilsparsers.src.dir}/ColorParser.java"
+				srcfile="${utilsparsers.src.dir}/ColorParser.jj" />
+			<available file="${utilsparsers.src.dir}/ColorParser.java" />
+		</and>
+	</condition>
+
+	<path id="classpath">
+		<pathelement location="${classes.dir}" />
+		<pathelement location="${src.dir}" />
+		<!-- junit.jar is needed only for test classes -->
+		<path location="${tool.dir}/junit.jar" />
+		
+		<path location="${lib.dir}/castor-1.3.2-core.jar"/>
+		<path location="${lib.dir}/castor-1.3.2-xml.jar"/>
+		<path location="${lib.dir}/commons-lang3-3.1.jar"/>
+		<path location="${lib.dir}/commons-logging-1.1.1.jar"/>
+		<path location="${lib.dir}/ini4j-0.5.2.jar"/>
+		<path location="${lib.dir}/jcommander-1.32.jar"/>
+		<path location="${lib.dir}/jsch-0.1.49.jar"/>
+		<path location="${lib.dir}/log4j-1.2.17.jar"/>
+		<path location="${lib.dir}/org.eclipse.jgit-2.1.0.201209190230-r.jar"/>
+		<path location="${lib.dir}/saxon9he.jar"/>
+		<path location="${lib.dir}/velocity-1.7-dep.jar"/>
+		<path location="${lib.dir}/xercesImpl.jar"/>
+		<path location="${lib.dir}/xml-apis.jar"/>
+		<path location="${lib.dir}/xmlunit-1.3.jar"/>
+
+		<path location="${lib.dir}/svnkit/antlr-runtime-3.4.jar"/>
+		<path location="${lib.dir}/svnkit/jna-3.4.0.jar"/>
+		<path location="${lib.dir}/svnkit/sequence-library-1.0.2.jar"/>
+		<path location="${lib.dir}/svnkit/sqljet-1.1.1.jar"/>
+		<path location="${lib.dir}/svnkit/svnkit-1.7.4-v1.jar"/>
+		<path location="${lib.dir}/svnkit/svnkit-cli-1.7.5-v1.jar"/>
+		<path location="${lib.dir}/svnkit/svnkit-javahl16-1.7.5-v1.jar"/>
+		<path location="${lib.dir}/svnkit/trilead-ssh2-1.0.0-build215.jar"/>		
+		
+		<path location="${lib.dir}/evaluator/commons-math3-3.1.1.jar"/>
+		<path location="${lib.dir}/evaluator/jcommon-1.0.18.jar"/>
+		<path location="${lib.dir}/evaluator/jfreechart-1.0.14.jar"/>
+	</path>
+	
+	<target name="main" depends="bin-dist" />
+	<target name="compile-all" depends="compile-classes" />
+	<target name="world" depends="bin-dist,compile-junit" />
+
+	<target name="compile-parser" unless="uptodate.mainparser">
+		<mkdir dir="${parsers.out.dir}" />
+		<java classpath="${tool.dir}/javacc.jar" classname="javacc" failonerror="true">
+			<arg line="${javacc.args}" />
+			<arg value="-OUTPUT_DIRECTORY:${parsers.out.dir}" />
+			<arg value="${parsers.src.dir}/Parser.jj" />
+		</java>
+	</target>
+
+	<target name="compile-utilparsers" depends="compile-utilparsers-graphdefinition,compile-utilparsers-color">
+	</target>
+
+	<target name="compile-utilparsers-graphdefinition" unless="uptodate.utilparsers.graphdefinition">
+		<mkdir dir="${utilsparsers.out.dir}" />
+		<java classpath="${tool.dir}/javacc.jar" classname="javacc" failonerror="true">
+			<arg line="${javacc.args}" />
+			<arg value="-OUTPUT_DIRECTORY:${utilsparsers.out.dir}" />
+			<arg value="${utilsparsers.src.dir}/GraphDefinitionParser.jj" />
+		</java>
+	</target>
+
+	<target name="compile-utilparsers-color" unless="uptodate.utilparsers.color">
+		<mkdir dir="${utilsparsers.out.dir}" />
+		<java classpath="${tool.dir}/javacc.jar" classname="javacc" failonerror="true">
+			<arg line="${javacc.args}" />
+			<arg value="-OUTPUT_DIRECTORY:${utilsparsers.out.dir}" />
+			<arg value="${utilsparsers.src.dir}/ColorParser.jj" />
+		</java>
+	</target>
+
+	<target name="compile-classes" depends="compile-parser,compile-utilparsers">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${java.src.dir}" destdir="${classes.dir}"
+				includeantruntime="false" classpathref="classpath"
+				debug="true" debuglevel="lines,vars,source" encoding="UTF-8">
+			<compilerarg value="-Xlint:all"/>
+		</javac>
+		<copy todir="${classes.dir}/cz/cuni/mff/spl/conversion/">
+		  	<fileset dir="${java.src.dir}/cz/cuni/mff/spl/conversion/">
+		    	<include name="**/*.xml"/>
+		  	</fileset>
+		</copy>
+		<copy file="${java.src.dir}/log4j.properties" tofile="${classes.dir}/log4j.properties" />
+		<copy file="${java.src.dir}/log4j.verbose" tofile="${classes.dir}/log4j.verbose" />
+		<copy todir="${classes.dir}">
+		  	<fileset dir="${java.src.dir}">
+		    	<include name="**/*.vm"/>
+		  	</fileset>
+		</copy>
+	</target>
+	
+	<target name="compile-junit" depends="compile-classes">
+		<javac srcdir="${junit.src.dir}" destdir="${classes.dir}"
+				includeantruntime="false" classpathref="classpath" encoding="UTF-8">
+			<compilerarg value="-Xlint:unchecked"/>
+		</javac>
+		<copy todir="${classes.dir}">
+			<fileset dir="${java.src.dir}">
+				<include name="**/*.vm"/>
+			</fileset>
+			<fileset dir="${junit.src.dir}">
+				<include name="**/*.vcstest"/>
+				<include name="**/*.sshtest"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="compile-junit-othercp" depends="compile-classes">
+		<mkdir dir="${classes.othercp.dir}" />
+		<javac srcdir="${junit.othercp.src.dir}" destdir="${classes.othercp.dir}"
+				includeantruntime="false" classpathref="classpath" encoding="UTF-8">
+			<compilerarg value="-Xlint:unchecked"/>
+		</javac>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build.dir}" />	
+		<delete>
+			<fileset dir="${parsers.out.dir}">
+				<include name="*.java" />
+				<exclude name="**/package-info.java"/>
+			</fileset>
+		</delete>
+		<delete>
+			<fileset dir="${utilsparsers.out.dir}">
+				<include name="*.java" />
+				<exclude name="**/package-info.java"/>
+			</fileset>
+		</delete>
+	</target>	
+	
+	<target name="jar" depends="compile-all">
+		<mkdir dir="${jar.dir}" />
+		<jar destfile="${jar.dir}/${jar.name}" basedir="${classes.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="cz.cuni.mff.spl.Main" />
+				<attribute name="Class-path" value="\
+					${jar-xslt.name} \
+					\
+					castor-1.3.2-core.jar \
+					castor-1.3.2-xml.jar \
+					commons-lang3-3.1.jar \
+					commons-logging-1.1.1.jar \
+					ini4j-0.5.2.jar \
+					jcommander-1.32.jar \
+					jsch-0.1.49.jar \
+					log4j-1.2.17.jar \
+					org.eclipse.jgit-2.1.0.201209190230-r.jar \
+					saxon9he.jar \
+					velocity-1.7-dep.jar \
+					xercesImpl.jar \
+					xml-apis.jar \
+					xmlunit-1.3.jar \
+					\
+					antlr-runtime-3.4.jar \
+					jna-3.4.0.jar \
+					sequence-library-1.0.2.jar \
+					sqljet-1.1.1.jar \
+					svnkit-1.7.4-v1.jar \
+					svnkit-cli-1.7.5-v1.jar \
+					svnkit-javahl16-1.7.5-v1.jar \
+					trilead-ssh2-1.0.0-build215.jar \
+					\
+					commons-math3-3.1.1.jar \
+					jcommon-1.0.18.jar \
+					jfreechart-1.0.14.jar"/>		
+
+				
+			</manifest>
+			<fileset id="sources" dir="${java.src.dir}">
+				<include name="**/*.java"/>
+				<include name="**/*.jj"/>
+				<include name="**/*.vm"/>
+			</fileset>
+		</jar>
+		<jar destfile="${jar.dir}/${jar-xslt.name}" basedir="${xslt.src.dir}" includes="**/*.*" />
+	</target>
+	
+	<target name="bin-dist" depends="jar">
+		<mkdir dir="${dist.dir}" />
+		<copy todir="${dist.dir}/" flatten="true">
+			<resources>
+				<fileset dir="${jar.dir}">
+					<include name="**/*.jar"/>
+				</fileset>
+				<fileset dir="${lib.dir}">
+					<include name="**/*.jar"/>
+				</fileset>
+				<fileset dir="${src.dir}/script">
+				</fileset>
+			</resources>
+		</copy>
+	</target>
+
+	<target name="src-dist">
+		<delete dir="${src.dist.dir}/${source.dist.name}" />
+		<mkdir dir="${src.dist.dir}/${source.dist.name}" />
+		<copy todir="${src.dist.dir}/${source.dist.name}/src">
+			<fileset dir="${src.dir}" />
+		</copy>
+		<copy todir="${src.dist.dir}/${source.dist.name}/${lib.dir}">
+			<fileset dir="${lib.dir}" />
+		</copy>
+		<copy todir="${src.dist.dir}/${source.dist.name}" flatten="true">
+			<resources>
+				<file file="build.xml" />
+			</resources>
+		</copy>
+	</target>
+
+	<target name="zip-dist" depends="bin-dist">
+		<delete dir="${zip.dist.dir}" />
+		<mkdir dir="${zip.dist.dir}" />
+		<zip 
+			destfile="${zip.dist.dir}/${zip.dist.name}"
+			basedir="${dist.dir}"
+			update="true"/> 		
+	</target>
+	
+	<target name="doc" depends="compile-parser">
+		<mkdir dir="${javadoc.dir}" />
+		<javadoc destdir="${javadoc.dir}" overview="${java.src.dir}/overview.html" 
+      access="public" splitindex="true" use="true">
+			<packageset dir="${java.src.dir}"/>
+		</javadoc>
+	</target>
+	
+	<target name="test-junit" depends="compile-junit, compile-junit-othercp">
+		<mkdir dir="${junit.reports.dir}" />
+		<junit printsummary="no" haltonfailure="no" haltonerror="no" failureproperty="junit.failure">
+			<formatter type="brief" usefile="false" />
+			<formatter type="xml" />
+			<classpath refid="classpath" />
+			<batchtest fork="yes" todir="${junit.reports.dir}">
+				<fileset dir="${junit.src.dir}">
+					<include name="**/*Test.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<fail if="junit.failure" message="Some of the unit tests failed." />
+	</target>
+	
+	<target name="test-junit-fast" depends="compile-junit, compile-junit-othercp">
+		<mkdir dir="${junit.reports.dir}" />
+		<junit printsummary="no" haltonfailure="no" haltonerror="no" failureproperty="junit.failure">
+			<formatter type="brief" usefile="false" />
+			<formatter type="xml" />
+			<classpath refid="classpath" />
+			<batchtest fork="yes" todir="${junit.reports.dir}">
+				<fileset dir="${junit.src.dir}">
+					<include name="**/*Test.java" />
+					<exclude name="**/ConcurrentServerRunTest.java" />
+					<exclude name="**/BasicRunTest.java" />
+					<exclude name="**/ProjectsTest.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<fail if="junit.failure" message="Some of the unit tests failed." />
+	</target>
+	
+	<target name="test-junit-report">
+		<junitreport todir="${junit.reports.dir}">
+			<fileset dir="${junit.reports.dir}">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report todir="${junit.reports.dir}/html" format="frames" />
+		</junitreport>
+	</target>
+	
+	<target name="case-study" depends="bin-dist">
+		<mkdir dir="${case-study.dir}" />		
+		<get 
+			src="http://sourceforge.net/p/spl-tools/casestudy/ci/master/tree/src/spl/spl.xml?format=raw" 
+			dest="${case-study.dir}/spl.xml" />	
+		<get 
+			src="http://sourceforge.net/p/spl-tools/casestudy/ci/master/tree/src/spl/spl.ini?format=raw" 
+			dest="${case-study.dir}/spl.ini" />	
+		<java 
+			jar="${dist.dir}/${jar.name}" fork="true">
+				<arg value="${case-study.dir}/spl.xml"/>
+				<arg value="${case-study.dir}/spl-wd"/>
+				<arg value="${case-study.dir}/spl.ini"/>
+		</java>
+	</target>
+	
+</project>

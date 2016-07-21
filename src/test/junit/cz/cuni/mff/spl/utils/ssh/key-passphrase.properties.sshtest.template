@@ -1,0 +1,6 @@
+url=
+username=
+keyPath= name of the key in this package, passphrase protected
+trustAll=true
+
+test-input= passphrase

@@ -1,0 +1,288 @@
+options {
+	STATIC = false;
+}
+
+PARSER_BEGIN(ColorParser)
+/*
+ * Copyright (c) 2012, Frantisek Haas, Martin Lacina, Jaroslav Kotrc, Jiri Daniel
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the author nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+package cz.cuni.mff.spl.utils.parsers;
+
+import java.awt.Color;
+
+/**
+ * Simple parser implementation for color declarations.
+ * <p>
+ * Color declaration grammar is simple:
+ * <p>
+ * {@code rgb(<red>, <green>, <blue>)} | {@code <color defined by name>}
+ * <p>
+ * Where red, green, blue are integer values in interval [0,255].
+ * <p>
+ * Colors defined by name are:<br>
+ * {@code red}, {@code orange}, {@code yellow}, {@code green}, {@code cyan},
+ * {@code blue}, {@code violet}, {@code magenta}, {@code white}, {@code gray},
+ * {@code black}
+ * 
+ * @author Martin Lacina
+ */
+public class ColorParser {
+
+    /** The singleton shared instance. */
+    private static final ColorParser INSTANCE = new ColorParser("");
+
+    /** The VIOLET color instance. */
+    public static final Color       VIOLET   = new Color(128, 0, 255);
+
+    /** The LIGHT_GRAY color instance. */
+    public static final Color       LIGHT_GRAY   = new Color(211, 211, 211);
+
+    /** Create new parser from string specification. */
+    public ColorParser(String declaration) {
+        this(new java.io.BufferedReader(new java.io.StringReader(declaration)));
+    }
+
+    /**
+     * Tries to parse color declaration using static shared instance.
+     * <p>
+     * This method is thread-safe.
+     * 
+     * @param declaration
+     *            The declaration to parse.
+     * @return Color created by parser.
+     * @throws ParseException
+     *             If color declaration has wrong syntax.
+     */
+    public synchronized static Color ParseColorDefinition(String declaration) throws ParseException {
+        INSTANCE.ReInit(new java.io.BufferedReader(new java.io.StringReader(declaration)));
+        return INSTANCE.getColorDefinition();
+    }
+
+    /**
+     * Tries to parse color declaration using static shared instance.
+     * <p>
+     * This method is thread-safe.
+     * 
+     * @param declaration
+     *            The declaration to parse.
+     * @return Color configuration created by parser.
+     * @throws ParseException
+     *             If color declaration has wrong syntax.
+     */
+    public synchronized Color parseColorDefinition(String declaration) throws ParseException {
+        this.ReInit(new java.io.BufferedReader(new java.io.StringReader(declaration)));
+        return this.getColorDefinition();
+    }
+
+    /**
+     * Creates the color declaration string based on this parser implementation
+     * grammar.
+     * <p>
+     * When returned value is passed to parser, it should produce equal instance
+     * as the string declaration it was generated from.
+     * 
+     * @param declaration
+     *            The declaration.
+     * @return The declaration string representation.
+     */
+    public static String createColorDeclarationString(Color declaration) {
+        String knownColorName = getKnownColorName(declaration);
+        if (knownColorName != null) {
+            return knownColorName;
+        } else {
+            return String.format("rgb(%d, %d, %d)", declaration.getRed(), declaration.getGreen(), declaration.getBlue());
+        }
+    }
+
+	/**
+     * Gets the known color for name.
+     * <p>
+     * Only following names can be used: <br>
+     * {@code red}, {@code orange}, {@code yellow}, {@code green}, {@code cyan},
+     * {@code blue}, {@code violet}, {@code magenta}, {@code white},
+     * {@code gray}, {@code black}
+     * 
+     * @param colorName
+     *            The color name.
+     * @return The color.
+     * @throws ParseException
+     *             The parse exception is thrown when name is not known.
+     */
+    private Color getKnownColor(String colorName) throws ParseException {
+        switch (colorName) {
+            case "red":
+                return Color.red;
+            case "orange":
+                return Color.orange;
+            case "yellow":
+                return Color.yellow;
+            case "green":
+                return Color.green;
+            case "cyan":
+                return Color.cyan;
+            case "blue":
+                return Color.blue;
+            case "violet":
+                return VIOLET;
+            case "magenta":
+                return Color.magenta;
+            case "white":
+                return Color.white;
+            case "gray":
+                return Color.gray;
+            case "lightgray":
+                return LIGHT_GRAY;
+            case "black":
+                return Color.black;
+            default:
+                throw new ParseException(String.format("Unknown color for name '%s'.", colorName));
+        }
+    }
+
+    /**
+     * <p>
+     * Gets the known color name. When provided color is not known one, than
+     * {@code null} is returned.
+     * 
+     * @param color
+     *            The color.
+     * @return The known color name or {@code null}, when color is not know one.
+     * 
+     */
+    private static String getKnownColorName(Color color) {
+        if (color == null) {
+            return null;
+        }
+        if (color.equals(Color.red)) {
+            return "red";
+        }
+        if (color.equals(Color.orange)) {
+            return "orange";
+        }
+        if (color.equals(Color.yellow)) {
+            return "yellow";
+        }
+        if (color.equals(Color.green)) {
+            return "green";
+        }
+        if (color.equals(Color.cyan)) {
+            return "cyan";
+        }
+        if (color.equals(Color.blue)) {
+            return "blue";
+        }
+        if (color.equals(VIOLET)) {
+            return "violet";
+        }
+        if (color.equals(Color.magenta)) {
+            return "magenta";
+        }
+        if (color.equals(Color.white)) {
+            return "white";
+        }
+        if (color.equals(Color.gray)) {
+            return "gray";
+        }
+        if (color.equals(LIGHT_GRAY)) {
+            return "lightgray";
+        }
+        if (color.equals(Color.black)) {
+            return "black";
+        }
+        return null;
+    }
+
+}
+
+PARSER_END(ColorParser)
+
+SKIP :
+{
+	< " " >
+	| < "\t" >
+	| < "\n" >
+	| < "\r" >
+}
+
+TOKEN : {
+  	<RGB: "rgb" >
+	| <IDENTIFIER: ["a"-"z","A"-"Z", "_"] ( ["a"-"z","A"-"Z","0"-"9", "_"] )* >
+	| <NUMBER: "0" | (["1"-"9"](["0"-"9"])*) > 
+	| <COMMA: ",">
+	| <LEFT_PARENTHESIS: "(">
+	| <RIGHT_PARENTHESIS: ")">
+}
+
+Color getColorDefinition():
+{
+  	Token knownColor = null;
+  	Color rgb = null;
+}
+{
+	rgb = getRgb()
+    {
+		return rgb;
+	}
+
+	|
+
+	knownColor = <IDENTIFIER>
+	{
+		return this.getKnownColor(knownColor.image);
+	}
+		
+	<EOF>
+}
+
+Color getRgb():
+{
+  int red;
+  int green;
+  int blue;}
+{
+  <RGB> <LEFT_PARENTHESIS> red = byteValue() <COMMA> green = byteValue() <COMMA> blue = byteValue() <RIGHT_PARENTHESIS>
+  {
+    try {
+        return new Color(red, green, blue);
+    } catch (IllegalArgumentException e) {
+        throw new ParseException(e.getMessage());
+    }
+  }}
+
+/** Parsing integer */
+int byteValue():
+{
+    Token t = null;
+}
+{
+    t = <NUMBER> {
+      int value = Integer.parseInt(t.image);
+      if (value < 0 || value > 255) {
+         throw new ParseException(String.format("Byte value '%s' is out of range [0,255], line %s, column %s.", t.image, t.beginLine, t.beginColumn));      }
+      return value;
+  }
+}

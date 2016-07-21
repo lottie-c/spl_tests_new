@@ -1,0 +1,200 @@
+options {
+	STATIC = false;
+}
+
+PARSER_BEGIN(GraphDefinitionParser)
+/*
+ * Copyright (c) 2012, Frantisek Haas, Martin Lacina, Jaroslav Kotrc, Jiri Daniel
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the author nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+package cz.cuni.mff.spl.utils.parsers;
+
+import java.util.ArrayList;
+
+import cz.cuni.mff.spl.evaluator.graphs.GraphDefinition;
+import cz.cuni.mff.spl.evaluator.graphs.GraphDefinition.GraphType;
+import cz.cuni.mff.spl.evaluator.graphs.GraphDefinition.DataClipType;
+import cz.cuni.mff.spl.utils.StringUtils;
+
+/**
+ * Simple parser implementation for graph declarations.
+ * <p>
+ * Graph declaration grammar is simple:
+ * <p>
+ * {@code {@link GraphType}({@link DataClipType}, Double*)}
+ * <p>
+ * Where {@link GraphType} can be string value for any instance of this
+ * enumeration. Same for {@link DataClipType}.
+ * <p>
+ * Meaning of double arguments is defined for each {@link DataClipType}
+ * enumeration value.
+ * 
+ * @see GraphDefinition
+ * @see GraphType
+ * @see DataClipType
+ * 
+ * @author Martin Lacina
+ */
+public class GraphDefinitionParser {
+
+    /** The singleton shared instance. */
+    private static final GraphDefinitionParser INSTANCE = new GraphDefinitionParser("");
+
+    /** Create new parser from string specification. */
+    public GraphDefinitionParser(String declaration) {
+        this(new java.io.BufferedReader(new java.io.StringReader(declaration)));
+    }
+
+    /**
+     * Tries to parse graph configuration declaration using static shared
+     * instance.
+     * <p>
+     * This method is thread-safe.
+     * 
+     * @param declaration
+     *            The declaration to parse.
+     * @return Graph type configuration created by parser.
+     * @throws ParseException
+     *             If formula has wrong syntax.
+     */
+    public synchronized static GraphDefinition ParseGraphDefinition(String declaration) throws ParseException {
+        INSTANCE.ReInit(new java.io.BufferedReader(new java.io.StringReader(declaration)));
+        return INSTANCE.getGraphDefinition();
+    }
+
+    /**
+     * Tries to parse graph configuration declaration using static shared
+     * instance.
+     * <p>
+     * This method is thread-safe.
+     * 
+     * @param declaration
+     *            The declaration to parse.
+     * @return Graph type configuration created by parser.
+     * @throws ParseException
+     *             If formula has wrong syntax.
+     */
+    public synchronized GraphDefinition parseGraphDefinition(String declaration) throws ParseException {
+        this.ReInit(new java.io.BufferedReader(new java.io.StringReader(declaration)));
+        return this.getGraphDefinition();
+    }
+
+    /**
+     * Creates the graph declaration string based on this parser implementation
+     * grammar.
+     * <p>
+     * When is returned value passed to parser, it should produce equal instance
+     * as the string declaration was generated from.
+     * 
+     * @param declaration
+     *            The declaration.
+     * @return The declaration string representation.
+     */
+    public static String createGraphDeclarationString(GraphDefinition declaration) {
+        if (declaration.getDataClipParameters().isEmpty()) {
+            return String.format("%s(%s)", declaration.getBasicGraphType().name(), declaration.getDataClipType().name());
+        } else {
+            return String.format("%s(%s, %s)", declaration.getBasicGraphType().name(), declaration.getDataClipType().name(),
+                    StringUtils.createOneString(declaration.getDataClipParameters(), ", "));
+        }
+    }
+}
+
+PARSER_END(GraphDefinitionParser)
+
+SKIP :
+{
+	< " " >
+	| < "\t" >
+	| < "\n" >
+	| < "\r" >
+}
+
+TOKEN : {
+	<IDENTIFIER: ["a"-"z","A"-"Z", "_"] ( ["a"-"z","A"-"Z","0"-"9", "_"] )* >
+	| <REAL: <INT> (<EXPONENT> | ("." <INT> (<EXPONENT>)?)) >
+	| <INT: ( <DIGIT> )+ >
+	| <#DIGIT: ["0"-"9"] >
+	| <#EXPONENT: ("e"|"E")("+"|"-")?<INT> >
+	| <COMMA: ",">
+	| <LEFT_PARENTHESIS: "(">
+	| <RIGHT_PARENTHESIS: ")">
+}
+
+/** 
+ * Main method for parsing graph definition. 
+ * 
+ * @return Graph definition.
+ * @throws ParseException When error occurs during parsing.
+ */
+GraphDefinition getGraphDefinition():
+{
+  	Token graphType = null;
+  	Token clipType = null;
+  	double d;
+  	ArrayList<Double> values = new ArrayList<Double>(3);
+}
+{
+	graphType = <IDENTIFIER>
+		<LEFT_PARENTHESIS>
+			clipType = <IDENTIFIER> 
+			(
+			  <COMMA>
+			  d = number()
+			  { 
+			    values.add(d);
+			  }						)*
+		<RIGHT_PARENTHESIS>
+    <EOF>
+    {
+        GraphType graphTypeValue;
+        try {
+              graphTypeValue = GraphType.valueOf(graphType.image);
+        } catch (IllegalArgumentException e){
+              throw new ParseException(e.getMessage());
+        }
+          
+        DataClipType dataClipType;
+        try {
+            dataClipType = DataClipType.valueOf(clipType.image);
+        }catch (IllegalArgumentException e){
+            throw new ParseException(e.getMessage());
+        }
+          
+        return GraphDefinition.createGraphDefinition(graphTypeValue, dataClipType, values);
+    }
+}
+
+/** Parsing and returning integer or real number */
+double number():
+{
+    Token t = null;
+}
+{
+    t = <INT> { return Integer.parseInt(t.image);}
+    | t = <REAL> {return Double.parseDouble(t.image);}
+}
+

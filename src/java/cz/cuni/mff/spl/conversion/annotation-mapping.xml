@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mapping for basic objects in cz.cuni.mff.spl.annotation.** -->
+<!-- @author Jiri Daniel -->
+<!-- @author Martin Lacina -->
+<mapping>
+    <class name="cz.cuni.mff.spl.annotation.Info">
+        <map-to xml="info"/>
+        <field name="projects" type="cz.cuni.mff.spl.annotation.Project"
+               collection="set"
+               set-method="addProject" get-method="getProjects">
+            <bind-xml name="project" node="element" location="projects"/>
+        </field>
+        <field name="generators" type="cz.cuni.mff.spl.annotation.Generator"
+               collection="set">
+            <bind-xml name="generator" node="element" location="generators"/>
+        </field>
+        <field name="methods" type="cz.cuni.mff.spl.annotation.Method"
+               collection="set">
+            <bind-xml name="method" node="element" location="methods"/>
+        </field>
+        <field name="measurements" type="cz.cuni.mff.spl.annotation.Measurement"
+               collection="set">
+            <bind-xml name="measurement" node="element" location="measurements"/>
+        </field>
+		<field name="globalGeneratorAliases" type="cz.cuni.mff.spl.annotation.GeneratorAliasDeclaration"
+		       collection="set">
+		    <bind-xml name="generator-declaration" node="element"  location="global-generators" />
+		</field>
+		<field name="globalMethodAliases" type="cz.cuni.mff.spl.annotation.MethodAliasDeclaration"
+		       collection="set">
+		    <bind-xml name="method-declaration" node="element" location="global-methods" />
+		</field>
+		<field name="splIntegratedGeneratorAliases" type="cz.cuni.mff.spl.annotation.GeneratorAliasDeclaration"
+		       collection="set">
+		    <bind-xml name="spl-integrated-generator" node="element"  location="spl-integrated-generators" />
+		</field>
+        <field name="annotationLocations" type="cz.cuni.mff.spl.annotation.AnnotationLocation"
+               collection="set">
+            <bind-xml name="annotation-location" node="element" location="annotation-locations"/>
+        </field>
+        <field name="parameters" collection="map" >
+            <bind-xml name="parameter" node="element" location="parameters">
+   				<class name="org.exolab.castor.mapping.MapItem">
+      				<field name="key" type="java.lang.String">
+        				<bind-xml name="name"/>
+      				</field>
+      				<field name="value" type="java.lang.Double">
+      				    <bind-xml name="value"/>
+      				</field>
+   				</class>         	
+            </bind-xml>
+        </field>
+    </class>
+
+    <class name="cz.cuni.mff.spl.annotation.Project" identity="id">
+        <map-to xml="project"/>
+        <field name="id" type="java.lang.String">
+            <bind-xml name="pid" node="attribute" type="ID" />
+        </field>
+        <field name="alias" type="java.lang.String">
+            <bind-xml name="alias" node="element" />
+        </field>
+        <field name="build" type="cz.cuni.mff.spl.annotation.Build">
+            <bind-xml name="build" node="element"  />
+        </field>
+        <field name="classpaths" type="java.lang.String" collection="arraylist">
+            <bind-xml name="classpath" node="element" location="classpaths"/>
+        </field>
+        <field name="scanPatterns" type="java.lang.String" collection="arraylist">
+            <bind-xml name="scanPattern" node="element" location="scanPatterns"/>
+        </field>
+        <field name="repository" type="cz.cuni.mff.spl.annotation.Repository">
+            <bind-xml name="repository" node="element" />
+        </field>
+    </class>
+
+    <class name="cz.cuni.mff.spl.annotation.Build">
+        <map-to xml="build"/>
+        <field name="command" type="java.lang.String">
+            <bind-xml node="text" />
+        </field>
+    </class>
+    
+    <class name="cz.cuni.mff.spl.annotation.Repository">
+        <map-to xml="repository"/>
+        <field name="type" type="java.lang.String">
+            <bind-xml name="type" node="attribute" />
+        </field>
+        <field name="url" type="java.lang.String">
+            <bind-xml name="url" node="attribute" />
+        </field>
+        <field name="revisions" type="cz.cuni.mff.spl.annotation.Revision"
+               collection="map" set-method="addRevision" get-method="getRevisions">
+            <bind-xml name="revision" node="element" location="revisions"/>
+        </field>
+    </class> 
+       
+    <class name="cz.cuni.mff.spl.annotation.Revision" identity="id">
+        <map-to xml="revision"/>
+        <field name="id" type="java.lang.String">
+            <bind-xml name="rid" node="attribute" type="ID" />
+        </field>
+        <field name="alias" type="java.lang.String">
+            <bind-xml name="alias" node="element" />
+        </field>
+        <field name="value" type="java.lang.String">
+            <bind-xml name="value" node="element" />
+        </field>
+        <field name="comment" type="java.lang.String">
+            <bind-xml name="comment" node="element" />
+        </field>
+        <field name="revisionIdentification" type="java.lang.String">
+            <bind-xml name="identification" node="element" />
+        </field>
+        <field name="project" type="cz.cuni.mff.spl.annotation.Project" transient="true">
+        </field>
+    </class>
+    
+    <class name="cz.cuni.mff.spl.annotation.Generator" identity="id">
+        <map-to xml="generator"/>
+        <field name="id" type="java.lang.String">
+            <bind-xml name="gid" node="attribute" type="ID" />
+        </field>
+        <field name="revision" type="cz.cuni.mff.spl.annotation.Revision">
+        	<bind-xml name="rref" node="attribute" type="IDREF" location="revision" reference="true"/>
+        </field>
+        <field name="path" type="java.lang.String">
+            <bind-xml name="path" node="element" />
+        </field>
+        <field name="parameter" type="java.lang.String">
+            <bind-xml name="parameter" node="element" />
+        </field>
+        <field name="method" type="cz.cuni.mff.spl.annotation.GeneratorMethod">
+        	<bind-xml name="genMethod" node="element"/>
+        </field>
+    </class>
+    
+    <class name="cz.cuni.mff.spl.annotation.GeneratorMethod">
+        <map-to xml="genMethod"/>
+        <field name="name" type="java.lang.String">
+            <bind-xml name="name" node="element"/>
+        </field>
+        <field name="parameter" type="java.lang.String">
+        	<bind-xml name="parameter" node="element"/>
+        </field>
+    </class>
+
+    <class name="cz.cuni.mff.spl.annotation.Method" identity="id">
+        <map-to xml="method"/>
+        <field name="id" type="java.lang.String">
+            <bind-xml name="mid" node="attribute" type="ID" />
+        </field>
+        <field name="path" type="java.lang.String">
+            <bind-xml name="path" node="element" />
+        </field>
+        <field name="parameter" type="java.lang.String">
+            <bind-xml name="parameter" node="element" />
+        </field>
+        <field name="name" type="java.lang.String">
+            <bind-xml name="name" node="element" />
+        </field>
+        <field name="revision" type="cz.cuni.mff.spl.annotation.Revision">
+        	<bind-xml name="rref" node="attribute" type="IDREF" location="revision" reference="true"/>
+        </field>
+        <field name="declarated" type="cz.cuni.mff.spl.annotation.Method$DeclarationType">
+            <bind-xml name="type" node="attribute" location="declarated" type="java.lang.String" />
+        </field>
+        <field name="parameterTypes" type="java.lang.String" collection="arraylist">
+            <bind-xml name="parameterTypes" node="element"/>
+        </field>
+    </class>
+
+    <class name="cz.cuni.mff.spl.annotation.Measurement" identity="id">
+        <map-to xml="measurement"/>
+        <field name="id" type="java.lang.String">
+            <bind-xml name="msid" node="attribute" type="ID" />
+        </field>
+        <field name="method" type="cz.cuni.mff.spl.annotation.Method">
+        	<bind-xml name="mref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="generator" type="cz.cuni.mff.spl.annotation.Generator">
+        	<bind-xml name="gref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+        <field name="machine.identification" type="java.lang.String">
+            <bind-xml name="computer-id" node="attribute" />
+        </field>
+        <field name="machine.name" type="java.lang.String">
+            <bind-xml name="computer-name" node="attribute" />
+        </field>
+        <field name="variable" type="cz.cuni.mff.spl.annotation.ExpandedVariable">
+        	<bind-xml name="variables" node="element" />
+        </field>
+        <field name="measurementState" type="cz.cuni.mff.spl.annotation.MeasurementState">
+        	<bind-xml name="measurement-state" node="element" />
+        </field>
+    </class>
+    
+    <class name="cz.cuni.mff.spl.annotation.Machine">
+    	<map-to xml="machine"/>
+        <field name="identification" type="java.lang.String">
+            <bind-xml name="identification" node="attribute" />
+        </field>
+        <field name="name" type="java.lang.String">
+            <bind-xml name="name" node="attribute" />
+        </field>
+    </class>
+    
+    <class name="cz.cuni.mff.spl.annotation.ExpandedVariable" >
+    	<field name="variables" type="java.lang.Integer"  collection="arraylist">
+            <bind-xml name="variable" node="element" />
+        </field>
+    </class>
+
+    <class name="cz.cuni.mff.spl.annotation.AnnotationLocation" identity="id">
+    	<map-to xml="annotation-location"/>
+    	<field name="id" type="java.lang.String">
+            <bind-xml name="aid" node="attribute" type="ID" />
+        </field>
+    	<field name="packageName" type="java.lang.String">
+        	<bind-xml name="package" node="attribute" />
+        </field>
+    	<field name="className" type="java.lang.String">
+        	<bind-xml name="class" node="attribute" />
+        </field>
+    	<field name="methodName" type="java.lang.String">
+        	<bind-xml name="method" node="attribute" />
+        </field>
+    	<field name="arguments" type="java.lang.String">
+        	<bind-xml name="arguments" node="attribute" />
+        </field>
+    	<field name="argumentsShort" type="java.lang.String">
+        	<bind-xml name="arguments-short" node="attribute" />
+        </field>
+    	<field name="returnType" type="java.lang.String">
+        	<bind-xml name="return-type" node="attribute" />
+        </field>
+    	<field name="returnTypeShort" type="java.lang.String">
+        	<bind-xml name="return-type-short" node="attribute" />
+        </field>
+    	<field name="fullSignature" type="java.lang.String">
+        	<bind-xml name="full-signature" node="attribute" />
+        </field>
+    	<field name="basicSignature" type="java.lang.String">
+        	<bind-xml name="basic-signature" node="attribute" />
+        </field>
+		<field name="generatorAliases" type="cz.cuni.mff.spl.annotation.GeneratorAliasDeclaration"
+		       collection="set">
+		    <bind-xml name="generator-declaration" node="element"/>
+		</field>
+		<field name="methodAliases" type="cz.cuni.mff.spl.annotation.MethodAliasDeclaration"
+		       collection="set">
+		    <bind-xml name="method-declaration" node="element"/>
+		</field>
+		<field name="formulas" type="cz.cuni.mff.spl.annotation.FormulaDeclaration"
+		       collection="set">
+		    <bind-xml name="formula-declaration" node="element"/>
+		</field>
+    </class>
+    
+    <class name="cz.cuni.mff.spl.annotation.ParsedDeclaration" verify-constructable="false" identity="id">
+    	<field name="id" type="java.lang.String">
+            <bind-xml name="pdid" node="attribute" type="ID" />
+        </field>
+    	<field name="image" type="java.lang.String">
+        	<bind-xml name="image" node="element" />
+        </field>
+		<field name="parserErrors" type="cz.cuni.mff.spl.formula.context.ParserContext$Problem"
+		       collection="set">
+		    <bind-xml name="error" node="element"/>
+		</field>
+		<field name="parserWarnings" type="cz.cuni.mff.spl.formula.context.ParserContext$Problem"
+		       collection="set">
+		    <bind-xml name="warning" node="element"/>
+		</field>
+    </class>
+
+	<class name="cz.cuni.mff.spl.annotation.ParsedAliasDeclaration" extends="cz.cuni.mff.spl.annotation.ParsedDeclaration">
+        <field name="alias" type="java.lang.String">
+            <bind-xml name="alias" node="element" />
+        </field>
+	</class>
+
+    <class name="cz.cuni.mff.spl.annotation.GeneratorAliasDeclaration" extends="cz.cuni.mff.spl.annotation.ParsedAliasDeclaration">
+    	<map-to xml="generatorAliasDeclaration"/>
+    	<field name="generator" type="cz.cuni.mff.spl.annotation.Generator">
+        	<bind-xml name="gref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+	</class>
+	
+    <class name="cz.cuni.mff.spl.annotation.MethodAliasDeclaration" extends="cz.cuni.mff.spl.annotation.ParsedAliasDeclaration">
+    	<map-to xml="methodAliasDeclaration"/>
+    	<field name="method" type="cz.cuni.mff.spl.annotation.Method">
+        	<bind-xml name="mref" node="attribute" type="IDREF" reference="true"/>
+        </field>
+	</class>
+	
+    <class name="cz.cuni.mff.spl.annotation.FormulaDeclaration" extends="cz.cuni.mff.spl.annotation.ParsedDeclaration">
+    	<map-to xml="formulaDeclaration"/>
+    	<field name="formula" type="cz.cuni.mff.spl.annotation.Formula">
+        	<bind-xml auto-naming="deriveByClass" node="element"/>
+        </field>
+	</class>
+
+    <class name="cz.cuni.mff.spl.annotation.Formula" verify-constructable="false" identity="id">
+    	<map-to xml="formula"/>
+    	<field name="id" type="java.lang.String">
+            <bind-xml name="fid" node="attribute" type="ID" />
+        </field>
+    </class>
+    
+    <class name="cz.cuni.mff.spl.annotation.Expression" extends="cz.cuni.mff.spl.annotation.Formula">
+        <map-to xml="expression"/>
+        <field name="left" type="cz.cuni.mff.spl.annotation.Formula">
+        	<bind-xml auto-naming="deriveByClass" node="element" location="leftFormula"/>
+        </field>
+        <field name="operator" type="cz.cuni.mff.spl.annotation.Operator">
+        	<bind-xml name="op" node="attribute" location="operator" type="java.lang.String" />
+        </field>
+        <field name="right" type="cz.cuni.mff.spl.annotation.Formula">
+        	<bind-xml auto-naming="deriveByClass" node="element" location="rightFormula"/>
+        </field>
+    </class>
+    
+    <class name="cz.cuni.mff.spl.annotation.Comparison" extends="cz.cuni.mff.spl.annotation.Formula">
+        <map-to xml="comparison"/>
+        <field name="leftMeasurement" type="cz.cuni.mff.spl.annotation.Measurement">
+        	<bind-xml name="msref" node="attribute" location="leftMethod" type="IDREF" reference="true"/>
+        </field>
+        <field name="leftLambda" type="cz.cuni.mff.spl.annotation.Lambda">
+        	<bind-xml name="leftLambda" node="element" />
+        </field>
+        <field name="sign" type="cz.cuni.mff.spl.annotation.Sign">
+        	<bind-xml name="type" node="attribute" location="sign" type="java.lang.String" />
+        </field>
+        <field name="rightMeasurement" type="cz.cuni.mff.spl.annotation.Measurement">
+        	<bind-xml name="msref" node="attribute" location="rightMethod" type="IDREF" reference="true"/>
+        </field>
+        <field name="rightLambda" type="cz.cuni.mff.spl.annotation.Lambda">
+        	<bind-xml name="rightLambda" node="element" />
+        </field>
+        <field name="interval" type="java.lang.Double">
+        	<bind-xml name="equality-interval" node="attribute" location="sign" />
+        </field>
+    </class>
+    
+    <class name="cz.cuni.mff.spl.annotation.Lambda">
+        <map-to xml="lambda"/>
+        <field name="constants" type="java.lang.Double" collection="arraylist">
+        	<bind-xml name="const" node="element"/>
+        </field>
+        <field name="parameters" type="java.lang.String" collection="arraylist">
+        	<bind-xml name="parameter" node="element"/>
+        </field>
+    </class>
+    
+    <class name="cz.cuni.mff.spl.annotation.MeasurementState">
+        <map-to xml="measurement-state"/>
+        <field name="ok" type="java.lang.Boolean">
+        	<bind-xml name="ok" node="attribute"/>
+        </field>
+        <field name="lastPhase" type="cz.cuni.mff.spl.annotation.MeasurementState$LastPhase">
+        	<bind-xml name="last-phase" node="attribute" type="java.lang.String"/>
+        </field>
+        <field name="message" type="java.lang.String">
+        	<bind-xml name="message" node="element"/>
+        </field>
+    </class>
+ 
+</mapping>

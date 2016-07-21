@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  @author Jiri Daniel 
+  
+  Contains Object - XML mappings
+  
+  -->
+<info>
+  <projects>
+    <project pid="p1">
+      <alias>project 1</alias>
+      <build>command 1</build>
+      <classpaths>
+        <classpath>project1classpath</classpath>
+      </classpaths>
+      <repository type="repoType1" url="url 1">
+        <revisions>
+          <revision rid="p1r1">
+            <alias>p1r1</alias>
+            <value>get revision 1 1</value>
+            <identification>revision1identification</identification>
+          </revision>
+          <revision rid="p1r2">
+            <alias>p1r2</alias>
+            <value>get revision 1 2</value>
+          </revision>
+        </revisions>
+      </repository>
+    </project>
+    <project pid="p2">
+      <alias>project 2</alias>
+      <build>command 2</build>
+      <scanPatterns>
+        <scanPattern>project2scanPattern</scanPattern>
+      </scanPatterns>
+      <repository type="repoType2" url="url 2">
+        <revisions>
+          <revision rid="p2r1">
+            <alias>p2r1</alias>
+            <value>get revision 2 1</value>
+          </revision>
+        </revisions>
+      </repository>
+    </project>
+  </projects>
+  <generators>
+    <generator gid="g1">
+      <path>gen.Gen1</path>
+      <parameter>param1</parameter>
+      <genMethod>
+        <name>generator method 1</name>
+        <parameter>generator method 1 parameter</parameter>
+      </genMethod>
+      <revision rref="p1r1" />
+    </generator>
+    <generator gid="g2">
+      <path>gen.Gen2</path>
+      <parameter>param2</parameter>
+      <genMethod>
+        <name>generator method 2</name>
+        <parameter>generator method 2 parameter</parameter>
+      </genMethod>
+      <revision rref="p2r1" />
+    </generator>
+    <generator gid="global-g1">
+      <path>gen.GlobalGen1</path>
+      <parameter>globalParam1</parameter>
+      <genMethod>
+        <name>global generator method 1</name>
+        <parameter>global generator method 1 parameter</parameter>
+      </genMethod>
+      <revision rref="p1r1" />
+    </generator>
+    <generator gid="integrated-g1">
+      <path>gen.IntegratedGen1</path>
+      <parameter>integratedParam1</parameter>
+      <genMethod>
+        <name>integrated generator method 1</name>
+        <parameter>integrated generator method 1 parameter</parameter>
+      </genMethod>
+      <revision rref="p1r1" />
+    </generator>
+  </generators>
+  <methods>
+    <method mid="m1">
+      <path>meth.Meth1</path>
+      <parameter>method param1</parameter>
+      <name>method1</name>
+      <revision rref="p1r1" />
+      <declarated type="WITHOUT_PARAMETERS" />
+    </method>
+    <method mid="m2">
+      <path>meth.Meth2</path>
+      <parameter>method param2</parameter>
+      <name>method2</name>
+      <revision rref="p2r1" />
+      <declarated type="WITHOUT_PARAMETERS" />
+    </method>
+    <method mid="global-m1">
+      <path>meth.GlobalMeth1</path>
+      <parameter>global method param1</parameter>
+      <name>globalMethod1</name>
+      <revision rref="p1r1" />
+      <declarated type="WITHOUT_PARAMETERS" />
+    </method>
+  </methods>
+  <measurements>
+    <measurement msid="ms1" mref="m1" gref="g1" computer-id="machine1" computer-name="PC1">
+      <variables>
+        <variable>0</variable>
+        <variable>1</variable>
+      </variables>
+      <measurement-state ok="true" last-phase="INITIALIZED"/>
+    </measurement>
+    <measurement msid="ms2" mref="m2" gref="g2" computer-id="machine2" computer-name="PC2">
+      <variables>
+        <variable>3</variable>
+        <variable>1</variable>
+      </variables>
+      <measurement-state ok="true" last-phase="INITIALIZED"/>
+    </measurement>
+  </measurements>
+  <global-generators>
+    <generator-declaration pdid="pd-gg-1" gref="global-g1">
+      <image>global generator 1</image>
+      <alias>global generator 1</alias>
+    </generator-declaration>
+  </global-generators>
+  <global-methods>
+    <method-declaration pdid="pd-gm-1" mref="global-m1">
+      <image>global method 1</image>
+      <alias>global method 1</alias>
+    </method-declaration>
+  </global-methods>
+  <spl-integrated-generators>
+    <spl-integrated-generator pdid="pd-ig-1" gref="integrated-g1">
+      <image>integrated generator 1</image>
+      <alias>integrated generator 1</alias>
+    </spl-integrated-generator>
+  </spl-integrated-generators>
+  <annotation-locations>
+    <annotation-location aid="aloc1" package="cz.cuni.mff.spl.conversion" class="XmlConversionTest"
+    method="init" arguments="" arguments-short="" return-type="void" return-type-short="void"
+    full-signature="public void cz.cuni.mff.spl.conversion.XmlConversionTest.init() throws cz.cuni.mff.spl.conversion.ConversionException"
+    basic-signature="public void cz.cuni.mff.spl.conversion.XmlConversionTest.init()">
+      <generator-declaration pdid="pd-g-1" gref="g1">
+        <image>generator 1</image>
+        <alias>generator 1</alias>
+      </generator-declaration>
+      <method-declaration pdid="pd-m-1" mref="m1">
+        <image>method 1</image>
+        <alias>method 1</alias>
+      </method-declaration>
+      <formula-declaration pdid="pd-f-1">
+        <image>formula 1</image>
+        <expression fid="expr1">
+          <leftFormula>
+            <comparison fid="comp1">
+              <leftLambda>
+                <const>2.0</const>
+              </leftLambda>
+              <rightLambda>
+                <const>10.2</const>
+              </rightLambda>
+              <leftMethod msref="ms1" />
+              <sign type="LE" />
+              <rightMethod msref="ms2" />
+            </comparison>
+          </leftFormula>
+          <rightFormula>
+            <comparison fid="comp2">
+              <leftLambda>
+                <const>0.0</const>
+              </leftLambda>
+              <rightLambda>
+                <const>10.2</const>
+              </rightLambda>
+              <leftMethod msref="ms2" />
+              <sign type="GT" />
+              <rightMethod msref="ms1" />
+            </comparison>
+          </rightFormula>
+          <operator op="AND" />
+        </expression>
+      </formula-declaration>
+      <formula-declaration pdid="pd-f-2">
+        <image>formula 2</image>
+        <expression fid="expr2">
+          <leftFormula>
+            <comparison fid="comp2">
+              <leftLambda>
+                <const>0.0</const>
+              </leftLambda>
+              <rightLambda>
+                <const>10.2</const>
+              </rightLambda>
+              <leftMethod msref="ms2" />
+              <sign type="GT" />
+              <rightMethod msref="ms1" />
+            </comparison>
+          </leftFormula>
+          <rightFormula>
+            <comparison fid="comp1">
+              <leftLambda>
+                <const>2.0</const>
+              </leftLambda>
+              <rightLambda>
+                <const>10.2</const>
+              </rightLambda>
+              <leftMethod msref="ms1" />
+              <sign type="LE" />
+              <rightMethod msref="ms2" />
+            </comparison>
+          </rightFormula>
+          <operator op="OR" />
+        </expression>
+      </formula-declaration>
+    </annotation-location>
+  </annotation-locations>
+  <parameters>
+    <parameter>
+      <name>P1</name>
+      <value>1.0</value>
+    </parameter>
+    <parameter>
+      <name>P2</name>
+      <value>2.0</value>
+    </parameter>
+  </parameters>
+</info>

@@ -1,0 +1,32 @@
+<info>
+    <projects>
+        <project pid = "THIS">
+            <alias>THIS</alias>
+            
+            <build>
+                ant
+            </build>
+            
+            <classpaths>
+                <classpath>
+                    build
+                </classpath>
+            </classpaths>
+            
+            <scanPatterns>
+                <scanPattern>
+                    main.**
+                </scanPattern>
+            </scanPatterns>
+            
+            <repository type="sourceRelative" url="this">
+                <revisions>
+                    <revision rid = "HEAD">
+                        <alias>HEAD</alias>
+                        <value></value>
+                    </revision>
+                </revisions>
+            </repository>
+        </project>
+    </projects>
+</info>

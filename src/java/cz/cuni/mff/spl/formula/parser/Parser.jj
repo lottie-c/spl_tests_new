@@ -1,0 +1,1417 @@
+options {
+	STATIC = false;
+}
+
+PARSER_BEGIN(Parser)
+/*
+ * Copyright (c) 2012, Frantisek Haas, Martin Lacina, Jaroslav Kotrc, Jiri Daniel
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the author nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+package cz.cuni.mff.spl.formula.parser;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import cz.cuni.mff.spl.annotation.Comparison;
+import cz.cuni.mff.spl.annotation.Expression;
+import cz.cuni.mff.spl.annotation.Formula;
+import cz.cuni.mff.spl.annotation.Generator;
+import cz.cuni.mff.spl.annotation.GeneratorAliasDeclaration;
+import cz.cuni.mff.spl.annotation.GeneratorMethod;
+import cz.cuni.mff.spl.annotation.Lambda;
+import cz.cuni.mff.spl.annotation.Measurement;
+import cz.cuni.mff.spl.annotation.Method;
+import cz.cuni.mff.spl.annotation.MethodAliasDeclaration;
+import cz.cuni.mff.spl.annotation.Operator;
+import cz.cuni.mff.spl.annotation.ParsedDeclaration;
+import cz.cuni.mff.spl.annotation.ParserVariable;
+import cz.cuni.mff.spl.annotation.Sign;
+import cz.cuni.mff.spl.formula.ParserException;
+import cz.cuni.mff.spl.formula.context.ParserContext;
+import cz.cuni.mff.spl.formula.context.ParserContext.Problem;
+import cz.cuni.mff.spl.formula.expander.Expander;
+import cz.cuni.mff.spl.formula.expander.Expander.ExpanderException;
+
+/**
+ * SPL formula parser.
+ * Between formulas there can be parenthesis and conjunction (&), disjunction
+ * (|) or implication (==>) operators
+ * (ordered descending by priority).
+ * <p>
+ * Parser use objects from package {@link cz.cuni.mff.spl.annotation} for
+ * returning value of formula specification and declaration of generator or
+ * method.
+ * <p>
+ * Generator or method can be parsed with static methods accordingly if they are
+ * declared
+ * <ul>
+ * <li>with alias
+ * <ul>
+ * <li>{@link #parseGeneratorAlias(String, ParserContext)}
+ * <li>{@link #parseMethodAlias(String, ParserContext)}
+ * </ul>
+ * <li>without alias
+ * <ul>
+ * <li>{@link #parseGeneratorDeclaration(String, ParserContext)}
+ * <li>{@link #parseMethodDeclaration(String, ParserContext)}
+ * </ul>
+ * </ul>
+ * This parsing runs only parser itself and can produce errors (not found
+ * project or revision) and generator can produce warnings (generator declared
+ * as class in default package) but method can not produce any warning.
+ * <p>
+ * For parsing whole formula use static method
+ * {@link #parseAndExpandFormula(String, ParserContext)}. This runs parser first
+ * and on the structure created by parser is called expansion for resolving
+ * variable names to values and generating objects with concrete values. This
+ * can produce both errors (duplicate variable, not declared variable, not found
+ * project or revision, not found alias, wrong number of sequence variables and
+ * their values) and warnings (not used variable, conversion of real parameter
+ * to integer value).
+ * <p>
+ * All parsing methods have as first parameter string to be parsed and second
+ * parameter is context that should be clone of context initialized from
+ * configuration.
+ * <p>
+ * Parser use {@link ParserContext} for finding projects, revisions and machine.
+ * The context has to be initialized before running the parser. Parser itself
+ * does not modifies the context except it stores into context problems occurred
+ * during parsing. However during expansion of formula objects all generators
+ * and methods are stored in the context by
+ * {@link cz.cuni.mff.spl.formula.expander.Expander Expander}
+ * 
+ * @author Jaroslav Kotrc
+ * @author Martin Lacina
+ * */
+public class Parser {
+    private ParserContext   context;
+    private ParserStructure structure;
+
+    public ParserContext getContext() {
+        return context;
+    }
+
+    /**
+     * Storing structure created by parser. Contains non expanded formula tree
+     * and variables.
+     * Have to be expanded before measurement.
+     * */
+    public static class ParserStructure {
+        public Formula   formula;
+        public Variables variables = new Variables();
+    }
+
+    /** Storing variables declared in formula */
+    public static class Variables {
+        public Map<String, ArrayList<Integer>> variables         = new HashMap<String, ArrayList<Integer>>();
+        public List<VariableSequence>     variableSequences = new ArrayList<VariableSequence>();
+
+        /** Returns number of declared variable entities. Entity is one
+         *  simple variable or one variable sequence.
+         *  */
+        public int entityCount() {
+            int cnt = 0;
+            if (variables != null) {
+                cnt = variables.size();
+            }
+            if (variableSequences != null) {
+                cnt += variableSequences.size();
+            }
+            return cnt;
+        }
+
+        /** Return number of all declared variables including variables
+         *  in sequences. Every sequence add the number of variables in
+         *  it to the general size.
+         *  */
+        public int variableCount() {            int cnt = 0;
+            if (variables != null) {
+                cnt = variables.size();
+            }
+            if (variableSequences != null) {
+                for (VariableSequence sequence : variableSequences) {
+                    cnt += sequence.size();                }
+            }
+            return cnt;
+        }
+
+        public void put(String name, ArrayList<Integer> values) {
+            variables.put(name, values);
+        }
+
+        public void put(VariableSequence sequence) {
+            variableSequences.add(sequence);
+        }
+
+        /**
+         * Checks if variable with given name is already defined and if so
+         * then error is added to the context.
+         * 
+         * @param name
+         *            name of the variable
+         * @param context
+         *            Parser context to store errors
+         * */
+        public void checkDefinedVariable(String name, ParserContext context) {
+            if ((variables != null) && (variables.containsKey(name))) {
+                context.addError(new ParserContext.Problem("Variable " + name + " already defined as a variable"));
+            }
+            if (variableSequences != null) {
+                for (VariableSequence sequence : variableSequences) {
+                    if ((sequence != null) && (sequence.variables != null) && (sequence.variables.containsKey(name))) {
+                        context.addError(new ParserContext.Problem("Variable " + name + " already defined in sequence of variables"));
+                    }
+                }
+            }
+            if (context.getParameter(name) != null) {
+                context.addError(new ParserContext.Problem("Variable " + name + " already defined as a parameter"));
+            }
+        }
+    }
+
+    /** Storing one parameter sequence */
+    public static class VariableSequence {
+        private final Map<String, Integer> variables = new LinkedHashMap<String, Integer>();
+        private ArrayList<ArrayList<Integer>>   valuesList;
+        private int valuesCount = 0;
+
+        /**
+         * Returns list of integer values for given variable name
+         * 
+         * @returns list of integer values for given variable name
+         * */
+        public ArrayList<Integer> getValuesForName(String name) {
+            Integer idx = variables.get(name);
+            if (idx != null) {
+                return valuesList.get(idx);
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Returns one concrete value of specified variable
+         * 
+         * @param variableIdx
+         *            index of the variable in this sequence
+         * @param valueIdx
+         *            index of variable value in the list of this variable
+         *            values
+         * @return specified variable value
+         */
+        public int getValue(int variableIdx, int valueIdx) {
+            return valuesList.get(variableIdx).get(valueIdx);
+        }
+
+        /**
+         * Returns entry set of its variable map.
+         * 
+         * @return entry set of its variable map.
+         */
+        public Set<Entry<String, Integer>> getEntrySet() {
+            return variables.entrySet();
+        }
+
+        /**
+         * Put variable with given name and its index (index is used to obtain
+         * variable values from array of values). Index is given by variable
+         * name order.
+         * Also check if variable with given name is already defined in the same
+         * sequence of parameters and if so then error is added to parser context.
+         * */
+        public void putName(String name, Integer idx, ParserContext context) {
+            if (variables.get(name) != null) {
+                context.addError(new ParserContext.Problem("Variable " + name + " already defined in the same sequence"));
+            }
+            variables.put(name, idx);
+        }
+
+        /** Set values in the array of values to the specified index. */
+        public void setValues(int idx, ArrayList<Integer> values) {
+            valuesList.add(idx, values);
+            valuesCount = values.size();
+        }
+
+        /** Initialize the valuesArr to specified size */
+        public void initValuesList(int size) {
+            valuesList = new ArrayList<ArrayList<Integer>>(size);
+        }
+
+        /** Returns number of variables in the sequence */ 
+        public int size() {
+          return variables.size();        }
+
+        /** Returns number of values each variable should have if no error arise */
+        public int valuesCount() {
+          return valuesCount;        }
+    }
+
+    /**     * Class for parser to return aliases.
+     * 
+     * @author LacinaM
+     * 
+     * @param <T>
+     *            Type of alias declaration
+     */
+    private class AliasDeclaration<T> {
+        /** Parsed alias target. */
+        private final T      target;
+        /** Method alias. */
+        private final String alias;
+
+        public T getTarget() {
+            return target;
+        }
+
+        public String getAlias() {
+            return alias;
+        }
+
+        /**
+         * Initializes new instance with alias and method.
+         * 
+         * @param alias
+         *            Method alias.
+         * @param declaredObject
+         *            The declared object instance.
+         */
+        public AliasDeclaration(String alias, T declaredObject) {
+            this.alias = alias;
+            this.target = declaredObject;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s=%s", getAlias(), getTarget());
+        }
+    }
+
+    /**
+     * Class for class name stored as linked list of package name parts and
+     * parameter.
+     */
+    private class ClassEntity {
+        private final LinkedList<String> packages = new LinkedList<String>();
+        public String                    parameter;
+
+        /**
+         * Returns if the class can be only alias without full specification.
+         * Even if it does, the other variant is static class without packages
+         * before name.
+         */
+        public boolean canBeAlias() {
+            return ((packages.size() <= 1) && (parameter == null));
+        }
+
+        public void addFirst(String str) {
+            if (str != null) {
+                packages.addFirst(str);
+            }
+        }
+
+        public void add(String str) {
+            if (str != null) {
+                packages.add(str);
+            }
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder strb = new StringBuilder();
+            Iterator<String> it = packages.iterator();
+            if (it.hasNext()) {
+                strb.append(it.next());
+            }
+            while (it.hasNext()) {
+                strb.append('.');
+                strb.append(it.next());
+            }
+            return strb.toString();
+        }
+    }
+
+    /**
+     * Class storing information for lambda expression which is two
+     * multiplications of constants or variables.
+     */
+    private class LambdaExpression {
+        private final Lambda leftLambda, rightLambda;
+        private final Double interval;
+
+        public LambdaExpression(Lambda left, Lambda right) {
+            leftLambda = left;
+            rightLambda = right;
+            interval = null;
+        }
+
+        public LambdaExpression(Lambda left, Lambda right, Double interval) {
+            this.leftLambda = left;
+            this.rightLambda = right;
+            this.interval = interval;
+        }
+
+        public Lambda getLeftLambda() {
+            return leftLambda;
+        }
+
+        public Lambda getRightLambda() {
+            return rightLambda;
+        }
+
+        public Double getInterval() {
+          	return interval;        }
+    }
+
+    /**
+     * Storing declaration of one alias splitted into two parts. First part is
+     * name of the alias and
+     * second part is whole declaration.
+     */
+    public static class SplittedAliasDeclaration {
+        private final String aliasName;
+        private final String aliasDeclaration;
+
+        public SplittedAliasDeclaration(String name, String declaration) {
+            aliasName = name;
+            aliasDeclaration = declaration;
+        }
+
+        public String getAliasName() {
+            return aliasName;
+        }
+
+        public String getAliasDeclaration() {
+            return aliasDeclaration;
+        }
+
+        public String mergeAliasDeclaration() {
+            return Parser.mergeAliasNameAndDefinition(this);
+        }
+    }
+
+    /** Create new parser from string specification. */
+    private Parser(String formula) {
+        this(new java.io.BufferedReader(new java.io.StringReader(formula)));
+    }
+
+    /** Returns image of the token and checks for null */
+    private String image(Token t) {
+        String str = null;
+        if (t != null) {
+            str = t.image;
+        }
+        return str;
+    }
+
+    /**
+     * Create single string message from all errors in parser context.
+     * 
+     * @param context
+     *            parser context where errors are stored
+     * @return all errors as single string
+     */
+    public static String createErrorMessage(ParserContext context) {        Set<Problem> errors = context.getErrors();
+        StringBuilder strb = new StringBuilder("Encountered ");
+        strb.append(errors.size());
+        strb.append(" errors during parsing:\n");
+        for (Problem error : errors) {
+            strb.append(error.getText());
+            strb.append('\n');
+        }
+        return strb.toString();
+    }
+
+    /**
+     * Static method for running complete parsing and expansion of given formula
+     * string with given parser context. Errors and warnings occurred during
+     * parsing and expansion are stored in the passed parser context. This runs
+     * parser first and on the structure created by parser is called expansion
+     * for resolving variable names to values and generating objects with
+     * concrete values. This can produce both errors (duplicate variable, not
+     * declared variable, not found project or revision, not found alias, wrong
+     * number of sequence variables and their values) and warnings (not used
+     * variable, conversion of real parameter to integer value).
+     * 
+     * @param input
+     *            formula string for parsing and expansion
+     * @param context
+     *            clone of original parser context. The original context should
+     *            be initialized before cloning from project configuration and
+     *            alias declaration
+     * @return expanded formula ready to use
+     * @throws ParserException
+     *             if some error occurs during formula parsing or expanding
+     */
+    public static Formula parseAndExpandFormula(String input, ParserContext context) throws ParseException {
+        try {
+            Parser parser = new Parser(input);
+            parser.context = context;
+            parser.splFormula();
+            if (!context.getErrors().isEmpty()) {
+                throw new ParserException(createErrorMessage(context));
+            }
+            return Expander.expandStructure(parser.structure, context);
+        } catch (TokenMgrError ex) {
+            throw new ParserException(ex);
+        } catch(ExpanderException ex) {
+            throw new ParserException(ex);
+        }
+    }
+
+     /**
+     * Runs parsing of single alias for method specification and returning
+     * structure storing method name and object. Can produce only errors
+     * (not found project or revision) but no warnings.
+     * 
+     * @throws ParseException
+     *             If alias declaration has wrong syntax or some errors
+     *             encountered during parsing.
+     * @param input
+     *            method declaration string for parsing
+     * @param context
+     *            clone of original parser context used for storing errors and
+     *            finding projects and revisions. The original context should be
+     *            initialized before cloning from project configuration and
+     *            alias declaration
+     * @return Structure created by parser.
+     */
+    public static MethodAliasDeclaration parseMethodAlias(String input, ParserContext context) throws ParseException {
+        try {
+            Parser parser = new Parser(input);
+            parser.context = context;
+            AliasDeclaration<Method> result = parser.getSplMethodAliasDeclaration();
+            if (!context.getErrors().isEmpty()) {
+                throw new ParserException(createErrorMessage(context));
+            }
+            return new MethodAliasDeclaration(result.getAlias(), result.getTarget(), input, context.getErrors(), context.getWarnings());
+        } catch (TokenMgrError ex) {
+            throw new ParserException(ex);
+        }
+    }
+
+    /**
+     * Runs parsing of single alias for generator specification and returning
+     * structure storing generator name and object. Can produce errors
+     * (not found project or revision) and warnings (generator declared
+     * as class in default package).
+     * 
+     * @throws ParseException
+     *             If alias declaration has wrong syntax or some errors
+     *             encountered during parsing.
+     * @param input
+     *            generator declaration string for parsing
+     * @param context
+     *            clone of original parser context used for storing errors and
+     *            finding projects and revisions. The original context should be
+     *            initialized before cloning from project configuration and
+     *            alias declaration
+     * @return Structure created by parser.
+     */
+    public static GeneratorAliasDeclaration parseGeneratorAlias(String input, ParserContext context) throws ParseException {
+		boolean issueWarningsForGeneratorAsClassInDefaultPackage = context.isIssueWarningsForGeneratorAsClassInDefaultPackage();
+		context.setIssueWarningsForGeneratorAsClassInDefaultPackage(false);
+        try {
+            Parser parser = new Parser(input);
+            parser.context = context;
+            AliasDeclaration<Generator> result = parser.getSplGeneratorAliasDeclaration();
+            if (!context.getErrors().isEmpty()) {
+                throw new ParseException(createErrorMessage(context));
+            }
+            return new GeneratorAliasDeclaration(result.getAlias(), result.getTarget(), input, context.getErrors(), context.getWarnings());
+        } catch (TokenMgrError ex) {
+            throw new ParserException(ex);
+        } finally {
+          	context.setIssueWarningsForGeneratorAsClassInDefaultPackage(issueWarningsForGeneratorAsClassInDefaultPackage);        }
+    }
+
+    /**
+     * Runs parsing of single method declaration without alias and returns
+     * method object. Can produce only errors (not found project or revision)
+     * but no warnings.
+     * 
+     * @throws ParseException
+     *             If declaration has wrong syntax or some errors
+     *             encountered during parsing.
+     * @param input
+     *            Method declaration string for parsing.
+     * @param context
+     *            clone of original parser context used for storing errors and
+     *            finding projects and revisions. The original context should be
+     *            initialized before cloning from project configuration and
+     *            alias declaration.
+     * @return Parsed declaration with Method object created by parser.
+     */
+    public static ParsedDeclaration<Method> parseMethodDeclaration(String input, ParserContext context) throws ParseException {
+        try {
+            Parser parser = new Parser(input);
+            parser.context = context;
+            Method method = parser.getSplMethodDeclaration();
+            if (!context.getErrors().isEmpty()) {
+                throw new ParseException(createErrorMessage(context));
+            }
+            // inner class
+            return new ParsedDeclaration<Method>(method, input, context.getErrors(), context.getWarnings()) {
+            };
+        } catch (TokenMgrError ex) {
+            throw new ParserException(ex);
+        }
+    }
+
+    /**
+     * Runs parsing of single generator declaration without alias and returns
+     * generator object. Can produce only errors (not found project or revision)
+     * and warnings (not found project or revision) and warnings (generator
+     * declared as class in default package).
+     * 
+     * @throws ParseException
+     *             If generator declaration has wrong syntax or some errors
+     *             encountered during parsing.
+     * @param input
+     *            Generator declaration string for parsing.
+     * @param context
+     *            Clone of original parser context used for storing errors and
+     *            finding projects and revisions. The original context should be
+     *            initialized before cloning from project configuration and
+     *            alias declaration.
+     * @return Parsed declaration with Generator object created by parser.
+     */
+    public static ParsedDeclaration<Generator> parseGeneratorDeclaration(String input, ParserContext context) throws ParseException {
+		boolean issueWarningsForGeneratorAsClassInDefaultPackage = context.isIssueWarningsForGeneratorAsClassInDefaultPackage();
+		context.setIssueWarningsForGeneratorAsClassInDefaultPackage(false);
+        try {
+            Parser parser = new Parser(input);
+            parser.context = context;
+            Generator generator = parser.getSplGeneratorDeclaration();
+            if (!context.getErrors().isEmpty()) {
+                throw new ParseException(createErrorMessage(context));
+            }
+            // inner class
+            return new ParsedDeclaration<Generator>(generator, input, context.getErrors(), context.getWarnings()) {
+            };
+        } catch (TokenMgrError ex) {
+            throw new ParserException(ex);
+        } finally {
+          	context.setIssueWarningsForGeneratorAsClassInDefaultPackage(issueWarningsForGeneratorAsClassInDefaultPackage);
+        }
+    }
+
+    /**
+     * Splits alias name and alias definition in provided declaration.
+     * Provided declaration has to contain character <code>=</code>.
+     * No further validations are done.
+     * 
+     * @param declaration
+     *            Declaration to separate alias name and definition.
+     * @return Alias name on index 0 and definition on index 1.
+     * @throws IllegalArgumentException
+     *             Thrown when declaration is {@code null}.
+     * @throws ParseException
+     *             Thrown when declaration does not
+     *             contain character {@code '='}.
+     * @see {@link Parser#mergeAliasNameAndDefinition(String, String)}
+     */
+    public static SplittedAliasDeclaration splitAliasNameAndDefinition(String declaration) throws ParseException {
+        if (declaration == null) {
+            throw new ParserException("Declaration can not be null.");
+        }
+        int equalsIndex = declaration.indexOf('=');
+        if(equalsIndex < 0){
+            throw new ParserException("Declaration does not contain character '='.");
+        }
+        String aliasName = declaration.substring(0, equalsIndex).trim();
+        String aliasDeclaration = declaration.substring(equalsIndex + 1).trim();
+        return new SplittedAliasDeclaration(aliasName, aliasDeclaration);
+    }
+
+    /**
+     * Connects provided alias name and definition to one string.
+     * Provided declaration cannot be null or empty.
+     * No further validations are done.
+     * 
+     * @param aliasName
+     *            Alias name, can not be {@code null}.
+     * @param aliasDefinition
+     *            Alias declaration, can not be {@code null}.
+     * @return One string with declaration of alias.
+     * @throws IllegalArgumentException
+     *             Thrown when alias name or definition is {@code null}.
+     * @see {@link Parser#splitAliasNameAndDefinition(String)}
+     * @see {@link Parser#parseMethodAlias(ParserContext)}
+     * @see {@link Parser#parseGeneratorAlias(ParserContext)}
+     */
+    public static String mergeAliasNameAndDefinition(String aliasName, String aliasDefinition) {
+        if (aliasName == null) {
+            throw new IllegalArgumentException("Alias name can not be null.");
+        }
+        if (aliasDefinition == null) {
+            throw new IllegalArgumentException("Alias declaration image can not be null.");
+        }
+        return String.format("%s=%s", aliasName, aliasDefinition);
+    }
+
+    /**
+     * Connects provided splitted alias declaration to one string.
+     * Provided declaration cannot be null or empty.
+     * No further validations are done.
+     * 
+     * @param aliasDeclaration
+     *            Alias declaration, can not be {@code null}.
+     * @return One string with declaration of alias.
+     * @throws IllegalArgumentException
+     *             Thrown when alias declaration is {@code null} or
+     *             when its alias name or definition is {@code null}.
+     * @see {@link Parser#splitAliasNameAndDefinition(String)}
+     * @see {@link Parser#parseMethodAlias(ParserContext)}
+     * @see {@link Parser#parseGeneratorAlias(ParserContext)}
+     */
+    public static String mergeAliasNameAndDefinition(SplittedAliasDeclaration aliasDeclaration) {
+        if (aliasDeclaration == null) {
+            throw new IllegalArgumentException("Alias declaration can not be null.");
+        }
+        return mergeAliasNameAndDefinition(aliasDeclaration.getAliasName(), aliasDeclaration.getAliasDeclaration());
+    }
+
+    /**
+     * Creates new method instance. This method creation depends on
+     * <code>parameterType</code>. If it is null the method without declared
+     * parameter types is created, otherwise method with declared parameter type
+     * is created.
+     * 
+     * @param projectName
+     *            name of the method project where method is
+     * @param revisionName
+     *            name of the revision where method is
+     * @param path
+     *            full path name including packages and classes
+     * @param parameter
+     *            the optional String parameter for constructor of methods class
+     * @param name
+     *            the name of the method
+     * @param context
+     *            parser context for searching of revision and projects
+     * @param parameterTypes
+     *            list with method parameter types
+     * @return object representing the method
+     */
+    private static Method createMethodAndDeclarationType(String projectName, String revisionName, String path, String parameter, String name,
+            ArrayList<String> parameterTypes,
+            ParserContext context) {
+        Method.DeclarationType type;
+        if (parameterTypes == null) {
+            type = Method.DeclarationType.WITHOUT_PARAMETERS;
+        } else {
+            type = Method.DeclarationType.WITH_PARAMETERS;
+        }
+        return Method.createMethod(projectName, revisionName, path, parameter, name, parameterTypes, type, context);
+    }
+    
+}
+
+PARSER_END(Parser) 
+
+SKIP :
+{
+	< " " >
+	| < "\t" >
+	| < "\n" >
+	| < "\r" >
+}
+
+TOKEN : {
+	<FOR: "for">
+	| <IDENTIFIER: ["a"-"z","A"-"Z", "_"] ( ["a"-"z","A"-"Z","0"-"9", "_"] )* >
+	| <REAL: <INT> (<EXPONENT> | ("." <INT> (<EXPONENT>)?)) >
+	| <INT: ( <DIGIT> )+ >
+	| <#DIGIT: ["0"-"9"] >
+	| <#EXPONENT: ("e"|"E")("+"|"-")?<INT> >
+	| <COMMA: ",">
+	| <DOT: ".">
+	| <AT: "@">
+	| <COLON: ":">
+	| <HASH: "#">
+    | <ASTERISK: "*">
+	| <LEFT_PARENTHESIS: "(">
+	| <RIGHT_PARENTHESIS: ")">
+	| <LEFT_BRACE: "{">
+	| <RIGHT_BRACE: "}">
+	| <LEFT_BRACKET: "[">
+	| <RIGHT_BRACKET: "]">
+	| <CMP_EQ: "=">
+	| <CMP_EQ_FULL: "==">
+    | <CMP_GT: ">">
+    | <CMP_LT: "<">
+	| <CMP_GE: ">=">
+	| <CMP_LE: "<=">
+	| <LOGIC_AND: "&">
+	| <LOGIC_IMPLY: "==>">
+	| <LOGIC_OR: "|">
+	| <STRING_LITERAL:
+       "'"
+	      (   (~["\"","\\","\n","\r", "'"])
+	        | ("\\"
+	            ( ["n","t","b","r","f","\\","'","\""]
+	            | ["0"-"7"] ( ["0"-"7"] )?
+	            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+	            )
+	          )
+	      )*
+      "'">
+}
+
+/** Main method parsing whole formula specification.
+ *
+ * @throws ParseException When error occurs during parsing.
+ * */
+void splFormula():
+{
+	Formula root = null;
+}
+{
+    { structure = new ParserStructure(); }
+    (variables())? root = splImplyFormula()
+    { structure.formula = root; }
+    <EOF>
+}
+
+/** 
+ * Main method parsing method alias declaration. 
+ * 
+ * @return Method alias declaration.
+ * @throws ParseException When error occurs during parsing.
+ */
+AliasDeclaration<Method> getSplMethodAliasDeclaration():
+{
+	Method method = null;
+  	Token name = null;
+}
+{
+	name = <IDENTIFIER> <CMP_EQ> method = methodEntity()
+    <EOF>
+    {
+      if(method == null){
+        throw new ParseException("Cannot find referenced method for declaration of method alias: "+name.image+".");
+      }
+      return new AliasDeclaration<Method>(name.image, method); }
+}
+
+/** 
+ * Main method parsing generator alias declaration. 
+ * 
+ * @return Generator alias declaration.
+ * @throws ParseException When error occurs during parsing.
+ */
+AliasDeclaration<Generator> getSplGeneratorAliasDeclaration():
+{
+	Generator generator = null;
+  	Token name = null;
+}
+{
+	name = <IDENTIFIER> <CMP_EQ> generator = generatorEntity()
+    <EOF>
+    {
+      if(generator == null){
+        throw new ParseException("Cannot find referenced generator for declaration of generator alias: "+name.image+".");
+      }
+      return new AliasDeclaration<Generator>(name.image, generator); }
+}
+
+/** 
+ * Main method parsing method declaration. 
+ * 
+ * @return Method declaration.
+ * @throws ParseException When error occurs during parsing.
+ */
+Method getSplMethodDeclaration():
+{
+	Method method = null;
+}
+{
+	method = methodEntity()
+    <EOF>
+    {
+      return method; }
+}
+
+/** 
+ * Main method parsing generator declaration. 
+ * 
+ * @return Generator declaration.
+ * @throws ParseException When error occurs during parsing.
+ */
+Generator getSplGeneratorDeclaration():
+{
+	Generator generator = null;
+}
+{
+	generator = generatorEntity()
+    <EOF>
+    {
+      return generator; }
+}
+
+/** Parsing variables with values used in formula. */
+void variables():
+{
+  Token name = null;
+  Token value = null;
+  ArrayList<Integer > values = null;
+  VariableSequence sequence = null;
+}
+{
+    <FOR> <LEFT_PARENTHESIS>
+    (      (name = <IDENTIFIER> 
+      { structure.variables.checkDefinedVariable(name.image, context); }
+      <LEFT_BRACE> values = variableValues() <RIGHT_BRACE>
+        { structure.variables.put(name.image, values);
+          context.addVariable(name.image);  
+        }      )
+	  | ( sequence = variableSequence()	       { structure.variables.put(sequence);}
+	  )
+    )+
+    <RIGHT_PARENTHESIS>
+}
+
+/** Parsing one variable sequence. */
+VariableSequence variableSequence():{
+  VariableSequence sequence = new VariableSequence();
+  int nameCount = 0;
+  int valuesCount = 0;
+  int initValueSize = 0;
+  int nextValueSize = 0;
+  ArrayList<Integer > values = null;
+  Token name = null;}{
+  <LEFT_PARENTHESIS>
+	  (name = <IDENTIFIER> 
+	  { structure.variables.checkDefinedVariable(name.image, context);
+	    sequence.putName(name.image, nameCount, context);
+	    context.addVariable(name.image);
+	    ++nameCount;
+	  })
+	  (< COMMA > name = <IDENTIFIER> 
+      { structure.variables.checkDefinedVariable(name.image, context);
+        sequence.putName(name.image, nameCount, context);
+        context.addVariable(name.image);
+        ++nameCount;
+      })*
+  <RIGHT_PARENTHESIS>
+  <LEFT_BRACE>
+    <LEFT_PARENTHESIS>
+        values = variableValues()        { sequence.initValuesList(nameCount);
+          sequence.setValues(valuesCount, values);
+          ++ valuesCount;
+          initValueSize = values.size();
+        }
+    <RIGHT_PARENTHESIS>
+    ( < COMMA >      <LEFT_PARENTHESIS>
+	      values = variableValues()
+	      {
+	        if(valuesCount > nameCount - 1) {
+	          context.addError(new ParserContext.Problem("There is more variables value sets than variables in the sequence"));	        } else {
+	          sequence.setValues(valuesCount, values);	        }	      
+	        ++ valuesCount;
+	        nextValueSize = values.size();
+	        if(nextValueSize != initValueSize) {
+	          context.addError(new ParserContext.Problem("Value set has different number of values."));	        }
+	      }
+      <RIGHT_PARENTHESIS>
+    )*
+  <RIGHT_BRACE>
+  {
+    if(valuesCount != nameCount) {
+          context.addError(new ParserContext.Problem("There is different count of variables and its sets of values in the sequence"));
+        }
+    return sequence;
+  }}
+
+/** Parsing one or more integer values of variables separated by comma. */
+ArrayList<Integer > variableValues():{
+  Token value = null;
+  ArrayList<Integer > values = null;}{
+    value = < INT >
+	{	values = new ArrayList<Integer >();
+	values.add(Integer.parseInt(value.image));
+	}
+	(<COMMA> value = < INT >
+	    { values.add(Integer.parseInt(value.image)); }
+	)*
+    { return values;}}
+
+/** Parsing one formula and returning it as it is or parsing at least two formulas
+ connected with logical IMPLICATION and creating expression tree for it.*/
+Formula splImplyFormula():
+{
+  Formula formula = null;
+  Formula implyFormula = null;
+}
+{
+    formula = splOrFormula()
+    (<LOGIC_IMPLY> implyFormula = splOrFormula()
+        { formula = new Expression(formula, Operator.IMPL, implyFormula);}
+    )*
+    {return formula;}
+}
+
+/** Parsing one formula and returning it as it is or parsing at least two formulas
+ connected with logical OR and creating expression tree for it.*/
+Formula splOrFormula():
+{
+  Formula formula = null;
+  Formula orFormula = null;
+}
+{
+    formula = splAndFormula()
+    (<LOGIC_OR> orFormula = splAndFormula()
+        { formula = new Expression(formula, Operator.OR, orFormula);}
+    )*
+    {return formula;}
+}
+
+/** Parsing one formula and returning it as it is or parsing at least two formulas
+ connected with logical AND and creating expression tree for it.*/
+Formula splAndFormula():
+{
+  Formula formula = null;
+  Formula andFormula = null;
+}
+{
+    formula = splParenthesisFormula()
+    (<LOGIC_AND> andFormula = splParenthesisFormula()
+        { formula = new Expression(formula, Operator.AND, andFormula);}
+    )*
+    {return formula;}
+}
+
+/** Parsing formula in parenthesis or just simple comparison */
+Formula splParenthesisFormula():
+{
+  Formula formula = null;
+}
+{
+    (<LEFT_PARENTHESIS> (formula = splImplyFormula() <RIGHT_PARENTHESIS>) 
+    | formula = comparison())
+    {return formula;}
+}
+
+/** Parsing one comparison */
+Comparison comparison():
+{
+  Measurement leftMeasurement = null;
+  Measurement rightMeasurement = null;
+  Sign sign = null;
+  Lambda leftLambda = null;
+  Lambda rightLambda = null;
+  LambdaExpression lambda = null;
+  Double interval = null;
+}
+{
+    leftMeasurement = measurementEntity()
+    (
+      (sign = sign() (lambda = lambda())?)
+      | (sign = signInterval() (lambda = lambdaInterval())?)
+    )
+    rightMeasurement = measurementEntity()
+    {
+      if(lambda!=null){
+        leftLambda = lambda.getLeftLambda();
+        rightLambda = lambda.getRightLambda();
+        interval = lambda.getInterval();
+      }
+      return new Comparison(leftMeasurement, leftLambda, sign, rightMeasurement, rightLambda, interval);
+    }
+}
+
+/** Returns enumeration of basic comparing sign without interval equality */
+Sign sign():
+{
+}
+{
+    <CMP_EQ_FULL> {return Sign.EQ;}
+    | <CMP_LT> {return Sign.LT;}
+    | <CMP_GT> {return Sign.GT;}
+    | <CMP_LE> {return Sign.LE;}
+    | <CMP_GE> {return Sign.GE;}
+}
+
+/** Returns lambda expression without interval parameter.
+    Lambda is two sequences of constants or variables separated by asterisk.
+    The second sequence is separated by comma. */
+LambdaExpression lambda():
+{
+    Lambda leftLambda = null;
+    Lambda rightLambda = null;
+}
+{
+    <LEFT_PARENTHESIS>
+    leftLambda = lambdaPart()
+    < COMMA >
+    rightLambda = lambdaPart()
+    <RIGHT_PARENTHESIS>
+    {return new LambdaExpression(leftLambda, rightLambda);}
+}
+
+/** Returns enumeration of interval equality comparing sign */
+Sign signInterval():
+{
+}
+{
+    <CMP_EQ> {return Sign.EQI;}
+}
+
+/** Returns lambda expression with optional interval parameter.
+    Optional parameter can be double value in parenthesis or can follow after
+    second sequence of lambda constants and variables separated by comma.*/
+LambdaExpression lambdaInterval():
+{
+	Lambda leftLambda = null;
+	Lambda rightLambda = null;
+	Double interval = null;
+	Double unknown = null;
+    Token identifier = null;
+}
+{
+    <LEFT_PARENTHESIS>
+    (
+      ( /* lambda starts with number, it can be left lambda part or interval */ 
+        unknown = number()
+        ( ( (
+              /* it is part of first lambda part */              < ASTERISK >
+	          leftLambda = lambdaPart()	          { leftLambda.getConstants().add(0, unknown); }
+	        )?
+	    
+  	       <COMMA>
+	        rightLambda = lambdaPart()
+	        {
+  	          if(leftLambda == null){
+	            /* it was whole left lambda part */
+	            leftLambda = new Lambda();
+	            leftLambda.add(unknown);
+	          }	        }
+	    
+	        ( <COMMA> interval = number() )?
+	        <RIGHT_PARENTHESIS>
+	      ) | (
+	        <RIGHT_PARENTHESIS>
+	        { interval = unknown; }
+	      )
+	    )
+
+	  ) | ( /* lambda starts with identifier, it can be only left lambda part */ 
+        identifier = < IDENTIFIER >
+        (
+          /* it is part of first lambda part */
+          < ASTERISK >
+          leftLambda = lambdaPart()
+          { leftLambda.getParameters().add(0, identifier.image); }
+        )?
+        
+        <COMMA>
+        rightLambda = lambdaPart()
+        {
+          if(leftLambda == null){
+            /* it was whole left lambda part */
+            leftLambda = new Lambda();
+            leftLambda.add(identifier.image);
+          }
+        }
+        
+        ( <COMMA> interval = number() )?
+        <RIGHT_PARENTHESIS>
+      )
+    )
+    {return new LambdaExpression(leftLambda, rightLambda, interval);}
+}
+
+/** Returns part of the lambda expression which is multiplication of variables or constants. */
+Lambda lambdaPart():
+{
+  Lambda lambda = new Lambda();
+  double d = 1.0;
+  Token identifier = null;
+}
+{
+  ((identifier = < IDENTIFIER >
+    { lambda.add(identifier.image); }
+  ) | ( d = number()
+    { lambda.add(d); }
+  ))
+  ( < ASTERISK >
+    ((identifier = < IDENTIFIER >
+        { lambda.add(identifier.image); }
+    ) | ( d = number()
+        { lambda.add(d); }
+    ))
+  )*
+  { return lambda; }
+}
+
+/** Parsing measurement of comparison which can not have lambda argument */
+Measurement measurementEntity():
+{
+  Method method = null;
+  Generator generator = null;
+  Measurement measurement = null;
+  Token identifier = null;
+  ParserVariable variables = null;
+}
+{   
+    method = methodEntity()
+    <LEFT_BRACKET> generator = generatorEntity() <RIGHT_BRACKET>
+	    (<LEFT_PARENTHESIS> (identifier = <IDENTIFIER> | identifier = <INT> )
+	        { variables = new ParserVariable(identifier.image); }
+	        (<COMMA> (identifier = <IDENTIFIER> | identifier = <INT> )
+	            { variables.addVariable(identifier.image); }
+	        )*
+        <RIGHT_PARENTHESIS>)?
+    {return new Measurement(method, generator, variables, context);}
+}
+
+/** Parsing method as an alias or full specification and returning it */
+Method methodEntity():
+{
+  Token project = null;
+  Token revision = null;
+  Token method = null;
+  Token identifier = null;
+  Token unknown = null;
+  ClassEntity classEntity = null;
+  Method newMethod = null;
+  ArrayList<String > types = null;
+}
+{
+  (
+    (<AT> revision = <IDENTIFIER> <COLON> identifier = <IDENTIFIER> classEntity = classEntity()
+    <HASH> method = <IDENTIFIER> (types = parameterTypes())? 
+        /* @version:pkg.AClass()#method */
+        {
+          classEntity.addFirst(identifier.image);
+          newMethod = createMethodAndDeclarationType(null, revision.image, classEntity.toString(), classEntity.parameter, method.image, types, context);
+        }
+     )
+    | (unknown = <IDENTIFIER> 
+        (((
+            (<AT> revision = <IDENTIFIER> <COLON> identifier = <IDENTIFIER> classEntity = classEntity()
+                /* project@version:pkg.AClass */
+	            {
+	              classEntity.addFirst(identifier.image);
+	              project = unknown;
+	            }
+            )   
+           | (<COLON> identifier = <IDENTIFIER> classEntity = classEntity()
+                /* project:pkg.AClass */
+                {
+                  classEntity.addFirst(identifier.image);
+                  project = unknown;
+                }
+            )                    
+           | ( classEntity = classEntity()
+                /* pkg.AClass */
+                {
+                  classEntity.addFirst(unknown.image);
+                }
+            )                                         
+          ) <HASH> method = <IDENTIFIER>
+            (types = parameterTypes())? 
+            /* #method */
+            {
+                newMethod = createMethodAndDeclarationType(image(project), image(revision), classEntity.toString(), classEntity.parameter, method.image, types, context );
+            }
+        )
+	    | ( /* just identifier which can be only alias */
+            {
+              newMethod = Method.createMethod(unknown.image, context);
+            }
+        )
+      )
+    )
+  )
+  {return newMethod;}
+}
+
+/** Parsing parenthesis with parameter types as a class name with optional parameter name */
+ArrayList<String > parameterTypes():
+{
+  ArrayList<String > types = new ArrayList<String >();
+  String type;}{
+  < LEFT_PARENTHESIS >
+    (type = parameterType() (< IDENTIFIER >)?	    { types.add(type); }
+	    (	      < COMMA > type = parameterType() (< IDENTIFIER >)?
+	        { types.add(type); }
+	    )*
+    )?
+  < RIGHT_PARENTHESIS >  { return types; } }
+
+/** Parsing full class name with packages */ 
+String parameterType():{
+  StringBuilder strb = new StringBuilder();
+  Token name = null;}{
+    name = < IDENTIFIER >    { strb.append(name); }
+    ( < DOT > name = < IDENTIFIER >
+        { strb.append('.');
+          strb.append(name);
+        }    )*
+    ( < LEFT_BRACKET > <RIGHT_BRACKET >
+        { strb.append("[]"); }    )*
+    { return strb.toString(); }}
+
+/** Parsing generator as an alias or full specification and returning it */
+Generator generatorEntity():
+{
+  Token project = null;
+  Token revision = null;
+  Token identifier = null;
+  Token unknown = null;
+  ClassEntity classEntity = null;
+  GeneratorMethod method = null;
+  Generator generator = null;
+  String parameter = null;
+}
+{
+  (
+    (<AT> revision = <IDENTIFIER> <COLON> identifier = <IDENTIFIER> classEntity = classEntity() (method = methodSpecification())?
+        /* @revision:pkg.AClass */
+        {
+          classEntity.addFirst(identifier.image);
+          generator = Generator.createGenerator(null, revision.image, classEntity.toString(), classEntity.parameter, method, context);
+        }
+    )
+    | (unknown = <IDENTIFIER> 
+        (
+          ((
+            (<AT> revision = <IDENTIFIER> <COLON> identifier = <IDENTIFIER> classEntity = classEntity()
+                /* project@revision:pkg.ACLass */
+                {   project = unknown;
+                    classEntity.addFirst(identifier.image);
+                }
+            )
+           | (<COLON> identifier = <IDENTIFIER> classEntity = classEntity()
+                /* project:pkg.AClass */
+                {   project = unknown;
+                    classEntity.addFirst(identifier.image);
+                }
+           )
+           | (  /*pkg.ACLass - package name contains at least one dot*/
+                {   classEntity = new ClassEntity();
+                    classEntity.add(unknown.image);
+                }
+             (<DOT> identifier = <IDENTIFIER>
+                { classEntity.add(identifier.image);}
+             )+  (parameter = parameter()
+                { classEntity.parameter = parameter;}
+             )? 
+           )        
+           | (parameter = parameter()
+                /* AClass(p1, p2, ...) - class name without packages with parameter */
+                {   classEntity = new ClassEntity();
+                    classEntity.add(unknown.image);
+                }
+           )
+        )  (method = methodSpecification())?
+	        {
+	          generator = Generator.createGenerator(image(project), image(revision), classEntity.toString(), classEntity.parameter, method, context);
+	        }
+        )
+      | (
+            (method = methodSpecification())?
+            /* if method is null - just identifier, can be alias or static class without package names */
+        {
+          if(method == null){            generator = Generator.createGenerator(unknown.image, context);          } else          {
+            generator = Generator.createGenerator(null, null, unknown.image, null, method, context);          }
+        }
+        )
+      )
+         
+    )
+  )
+  {return generator;}
+}
+
+/** Parsing optional parameter in parenthesis and returning it without apostrophes. */
+String parameter():
+{
+  Token t = null;
+}
+{
+    <LEFT_PARENTHESIS> ( t = <STRING_LITERAL>)? <RIGHT_PARENTHESIS>
+    {if (t != null)
+    {
+      assert(t.image.length() >=2): "Wrong string literal: " + t.image;
+      return t.image.substring(1, t.image.length() - 1);
+    } else
+    {
+      return null;}
+    }
+    
+}
+
+/** Parsing # and method name and parameter for generator specification*/
+GeneratorMethod methodSpecification():
+{
+  Token t = null;
+  String param = null;
+}
+{
+    <HASH>
+    t = <IDENTIFIER>
+    param = parameter()
+    {
+      return new GeneratorMethod(t.image, param);
+    }
+}
+
+/** Parsing full class name with packages and optional parameter*/
+ClassEntity classEntity():
+{
+  ClassEntity entity = new ClassEntity();
+  Token token = null;
+  String parameter = null;
+}
+{
+    (<DOT> token = <IDENTIFIER>
+        {entity.add(token.image);}
+    )*
+    (parameter = parameter()
+        {entity.parameter = parameter;}
+    )?
+    {return entity;}
+}
+
+/** Parsing and returning integer or real number */
+double number():
+{
+    double d;
+    Token t = null;
+}
+{
+    t = <INT> { return Integer.parseInt(t.image);}
+    | t = <REAL> {return Double.parseDouble(t.image); }
+}
