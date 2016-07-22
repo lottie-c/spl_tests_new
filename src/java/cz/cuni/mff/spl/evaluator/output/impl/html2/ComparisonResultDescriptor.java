@@ -36,6 +36,10 @@ import cz.cuni.mff.spl.evaluator.output.impl.html2.AnnotationResultDescriptor.An
 import cz.cuni.mff.spl.evaluator.output.impl.html2.MeasurementResultDescriptor.MeasurementValidationFlags;
 import cz.cuni.mff.spl.evaluator.output.results.ComparisonEvaluationResult;
 import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluator;
+import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorMWW;
+/*import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorKS;
+*/
+
 import cz.cuni.mff.spl.evaluator.statistics.MeasurementSample;
 import cz.cuni.mff.spl.evaluator.statistics.StatisticValueChecker;
 
@@ -49,6 +53,8 @@ public class ComparisonResultDescriptor extends OutputResultDescriptor {
     /** The comparison evaluation result. */
     private final ComparisonEvaluationResult comparisonEvaluationResult;
 
+
+
     /**
      * Gets the comparison evaluation result.
      * 
@@ -57,6 +63,7 @@ public class ComparisonResultDescriptor extends OutputResultDescriptor {
     public ComparisonEvaluationResult getComparisonEvaluationResult() {
         return comparisonEvaluationResult;
     }
+
 
     /** The comparison validation flags. */
     private final ComparisonValidationFlags comparisonValidationFlags = new ComparisonValidationFlags();
@@ -136,8 +143,10 @@ public class ComparisonResultDescriptor extends OutputResultDescriptor {
      * @param globalAliasesSummary
      *            The global aliases summary.
      */
-    public ComparisonResultDescriptor(Info info, ConfigurationBundle configuration, ComparisonEvaluationResult comparisonEvaluationResult,
-            StatisticValueChecker checker, BasicOutputFileMapping graphsMapping, ArrayList<Link> outputLinks, AnnotationValidationFlags globalAliasesSummary) {
+
+   
+    public ComparisonResultDescriptor(Info info, ConfigurationBundle configuration, ComparisonEvaluationResult comparisonEvaluationResult, 
+                StatisticValueChecker checker, BasicOutputFileMapping graphsMapping, ArrayList<Link> outputLinks, AnnotationValidationFlags globalAliasesSummary) {
         super(info, configuration, outputLinks, globalAliasesSummary);
         this.comparisonEvaluationResult = comparisonEvaluationResult;
 

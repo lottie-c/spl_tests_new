@@ -39,10 +39,17 @@ import cz.cuni.mff.spl.evaluator.statistics.MeasurementSample;
 public class ComparisonEvaluationResult extends AbstractEvaluationResult {
 
     /** The comparison. */
-    private Comparison       comparison;
+    private Comparison              comparison;
 
-    /** The comparison result. */
-    private ComparisonResult comparisonResult;
+    /** The comparison result performing a t test. */
+    private ComparisonResult        comparisonResult;
+
+    /** The comparison result performing a Mann Whitney U test. */
+    private ComparisonResult    comparisonResultMWW;
+
+    /** The comparison result performing a Kolmogorov Smirnov test. 
+    private ComparisonResult comparisonResultKS;
+    */
 
     /** The left measurement sample. */
     public MeasurementSample leftMeasurementSample;
@@ -62,10 +69,17 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
      * @param rightMeasurementSample
      *            The right measurement sample.
      */
-    public ComparisonEvaluationResult(Comparison comparison, ComparisonResult comparisonResult, MeasurementSample leftMeasurementSample,
+    
+    /* public ComparisonEvaluationResult(Comparison comparison, ComparisonResult comparisonResult, 
+        ComparisonResult comparisonResultMWW, ComparisonResult comparisonResultKS, MeasurementSample leftMeasurementSample,
+            MeasurementSample rightMeasurementSample)*/
+    public ComparisonEvaluationResult(Comparison comparison, ComparisonResult comparisonResult, 
+        ComparisonResult comparisonResultMWW, MeasurementSample leftMeasurementSample,
             MeasurementSample rightMeasurementSample) {
         this.comparison = comparison;
         this.comparisonResult = comparisonResult;
+        this.comparisonResultMWW = comparisonResultMWW;
+        /*this.comparisonResultKS = comparisonResultKS;*/
         this.leftMeasurementSample = leftMeasurementSample;
         this.rightMeasurementSample = rightMeasurementSample;
     }
@@ -89,6 +103,15 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
         return this.comparisonResult;
     }
 
+    public ComparisonResult getComparisonResultMWW() {
+        return this.comparisonResultMWW;
+    }
+
+    /*
+    public ComparisonResult getComparisonResultKS() {
+        return this.comparisonResultKS;
+    }*/
+
     public Comparison getComparison() {
         return this.comparison;
     }
@@ -106,12 +129,22 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
         return comparisonResult.getStatisticalResult();
     }
 
+    public StatisticalResult getStatisticalResultMWW() {
+        return comparisonResultMWW.getStatisticalResult();
+    }
+
+    /*public StatisticalResult getStatisticalResultKS() {
+        return comparisonResultKS.getStatisticalResult();
+    }*/
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((comparison == null) ? 0 : comparison.hashCode());
         result = prime * result + ((comparisonResult == null) ? 0 : comparisonResult.hashCode());
+        result = prime * result + ((comparisonResultMWW == null) ? 0 : comparisonResult.hashCode());
+        /*result = prime * result + ((comparisonResultKS == null) ? 0 : comparisonResult.hashCode());*/
         return result;
     }
 
@@ -123,6 +156,8 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
             return otherResult.isComparisonEvaluationResult()
                     && otherResult.getComparison().equals(comparison)
                     && otherResult.getComparisonResult().equals(comparisonResult)
+                    && otherResult.getComparisonResultMWW().equals(comparisonResultMWW)
+                    /*&& otherResult.getComparisonResultKS().equals(comparisonResultKS)*/
                     && otherResult.getLeftMeasurementSample().equals(leftMeasurementSample)
                     && otherResult.getRightMeasurementSample().equals(rightMeasurementSample);
         } else {
@@ -164,6 +199,32 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
     public void setComparisonResult(ComparisonResult comparisonResult) {
         this.comparisonResult = comparisonResult;
     }
+
+    /**
+     * Sets the Mann whitney u test comparison result .
+     * 
+     * For XML transformation only.
+     * 
+     * @param comparisonResult
+     *            The new comparison result.
+     */
+    @Deprecated
+    public void setComparisonResultMWW(ComparisonResult comparisonResultMWW) {
+        this.comparisonResultMWW = comparisonResultMWW;
+    }
+
+    /**
+     * Sets the Kolmogorov Smirnov test comparison result.
+     * 
+     * For XML transformation only.
+     * 
+     * @param comparisonResult
+     *            The new comparison result.
+     *
+     *public void setComparisonResultKS(ComparisonResult comparisonResultKS) {
+     *   this.comparisonResultKS = comparisonResultKS;
+     * }
+     */
 
     /**
      * Sets the left measurement sample.
