@@ -47,6 +47,7 @@ import cz.cuni.mff.spl.evaluator.output.results.EvaluationResult;
 import cz.cuni.mff.spl.evaluator.output.results.FormulaEvaluationResult;
 import cz.cuni.mff.spl.evaluator.output.results.LogicalOperationEvaluationResult;
 import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluator;
+import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorMWW;
 import cz.cuni.mff.spl.evaluator.statistics.MeasurementSample;
 import cz.cuni.mff.spl.evaluator.statistics.StatisticValueChecker;
 
@@ -62,7 +63,7 @@ class EvaluatorImpl {
     private final MeasurementSampleProvider measurementSampleProvider;
 
     /** The comparison evaluator. */
-    private final ComparisonEvaluator       comparisonEvaluator;
+    private final ComparisonEvaluatorMWW       comparisonEvaluatorMWW;
 
     /**
      * Instantiates a new evaluator.
@@ -76,7 +77,7 @@ class EvaluatorImpl {
      */
     EvaluatorImpl(MeasurementSampleProvider measurementSampleProvider, StatisticValueChecker checker, SplEvaluatorConfiguration configuration) {
         this.measurementSampleProvider = measurementSampleProvider;
-        this.comparisonEvaluator = new ComparisonEvaluator(configuration, checker);
+        this.comparisonEvaluatorMWW = new ComparisonEvaluatorMWW(configuration, checker);
     }
 
     /**
@@ -207,8 +208,8 @@ class EvaluatorImpl {
         outputProvider.generateMeasurementOutput(leftSample);
         outputProvider.generateMeasurementOutput(rightSample);
 
-        ComparisonResult comparisonResult = comparisonEvaluator.evaluate(formula, leftSample, rightSample);
-        result = new ComparisonEvaluationResult(formula, comparisonResult, leftSample, rightSample);
+        ComparisonResult comparisonResultMWW = comparisonEvaluatorMWW.evaluate(formula, leftSample, rightSample);
+        result = new ComparisonEvaluationResult(formula, comparisonResultMWW, leftSample, rightSample);
 
         outputProvider.generateComparisonOutput(result);
         releaseDataOnSamples(leftSample, rightSample);

@@ -103,7 +103,7 @@ public class ComparisonEvaluatorMWW {
      * @return The comparison result.
      */
     public ComparisonResult evaluate(Comparison comparison, MeasurementSample leftMeasurementSample,
-     MeasurementSample rightMeasurementSample) throws MeasurementDataNotFoundException {
+     MeasurementSample rightMeasurementSample) {
         if (leftMeasurementSample.getMeasurement().getMeasurementState().isOk() && rightMeasurementSample.getMeasurement().getMeasurementState().isOk()) {
             if (leftMeasurementSample.getSampleCount() >= 2 && rightMeasurementSample.getSampleCount() >= 2) {
 
@@ -240,9 +240,18 @@ public class ComparisonEvaluatorMWW {
      *      The lambda multiplier.
      * @return The transformed measurement.
      */
-    public static double[] transformMeasuredArray(MeasurementSample measurement, double lambdaMultiplier)throws MeasurementDataNotFoundException{
-        double[] data = measurement.getSampleDataProvider().loadRawData(lambdaMultiplier);
-        return data;
+    public static double[] transformMeasuredArray(MeasurementSample measurement, double lambdaMultiplier){
+       	
+
+        try{
+        	double[] data = measurement.getSampleDataProvider().loadRawData(lambdaMultiplier);
+        	return data;
+    	}catch (MeasurementDataNotFoundException e){
+    		System.out.println("Error obtaining raw data for MWW test: " + e);
+    		double[] data = {-1};
+    		return data;
+    	}
+        
     }
 
     public static double[] transformMeasuredArray(double[] array, double lambdaMultiplier){
