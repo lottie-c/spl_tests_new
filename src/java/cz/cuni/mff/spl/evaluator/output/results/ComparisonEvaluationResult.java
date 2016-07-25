@@ -143,8 +143,8 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
         int result = 1;
         result = prime * result + ((comparison == null) ? 0 : comparison.hashCode());
         result = prime * result + ((comparisonResult == null) ? 0 : comparisonResult.hashCode());
-        result = prime * result + ((comparisonResultMWW == null) ? 0 : comparisonResult.hashCode());
-        /*result = prime * result + ((comparisonResultKS == null) ? 0 : comparisonResult.hashCode());*/
+        /*result = prime * result + ((comparisonResultMWW == null) ? 0 : comparisonResult.hashCode());
+        result = prime * result + ((comparisonResultKS == null) ? 0 : comparisonResult.hashCode());*/
         return result;
     }
 
@@ -156,8 +156,8 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
             return otherResult.isComparisonEvaluationResult()
                     && otherResult.getComparison().equals(comparison)
                     && otherResult.getComparisonResult().equals(comparisonResult)
-                    && otherResult.getComparisonResultMWW().equals(comparisonResultMWW)
-                    /*&& otherResult.getComparisonResultKS().equals(comparisonResultKS)*/
+                    /*&& otherResult.getComparisonResultMWW().equals(comparisonResultMWW)
+                    && otherResult.getComparisonResultKS().equals(comparisonResultKS)*/
                     && otherResult.getLeftMeasurementSample().equals(leftMeasurementSample)
                     && otherResult.getRightMeasurementSample().equals(rightMeasurementSample);
         } else {

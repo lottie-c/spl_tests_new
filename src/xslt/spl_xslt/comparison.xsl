@@ -68,6 +68,8 @@
 
 		<xsl:variable name="statisticalResult"
 			select="$comparisonResult/comparison-result/@result" />
+		<xsl:variable name="statisticalResultMWW"
+			select="$comparisonResult/comparison-result-MWW/@result" />
 		<xsl:choose>
 			<xsl:when test="$statisticalResult = 'NOT_COMPUTED'">
 				<div class="section">
@@ -96,6 +98,8 @@
 			</xsl:when>
 			<xsl:when test="$statisticalResult = ('OK', 'FAILED')">
 				<xsl:variable name="isSatisfied" select="$statisticalResult eq 'OK'" />
+				<xsl:variable name="isSatisfiedMWW" select="$statisticalResultMWW eq 'OK'" />
+			
 				<div class="section">
 
 					<h2>Comparison statistical data</h2>
@@ -103,7 +107,7 @@
 					<table class="comparison-statistical-data statistical-data">
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
-								select="'Comparison evalution result'" />
+								select="' T-test Comparison evalution result '" />
 							<xsl:with-param name="VALUE" select="$statisticalResult" />
 							<xsl:with-param name="VALID" select="$isSatisfied" />
 						</xsl:call-template>
@@ -126,7 +130,37 @@
 								</xsl:call-template>
 							</xsl:with-param>
 						</xsl:call-template>
+
+
+						<xsl:call-template name="PRINTER.tableRow">
+							<xsl:with-param name="KEY"
+								select="'Mann Whitney Wilcoxon test Comparison evalution result'" />
+							<xsl:with-param name="VALUE" select="$statisticalResultMWW" />
+							<xsl:with-param name="VALID" select="$isSatisfiedMWW" />
+						</xsl:call-template>
+						<xsl:call-template name="PRINTER.tableRow">
+							<xsl:with-param name="KEY" select="'Mann Whitney Wilcoxon test p-value'" />
+							<xsl:with-param name="VALUE">
+								<xsl:call-template name="PRINTER.format.pvalue">
+									<xsl:with-param name="VALUE"
+										select="$comparisonResult/comparison-result-MWW/@pValue" />
+								</xsl:call-template>
+							</xsl:with-param>
+							<xsl:with-param name="VALID" select="$isSatisfiedMWW" />
+						</xsl:call-template>
+						<xsl:call-template name="PRINTER.tableRow">
+							<xsl:with-param name="KEY" select="'Mann Whitney Wilcoxon limit p-value'" />
+							<xsl:with-param name="VALUE">
+								<xsl:call-template name="PRINTER.format.pvalue">
+									<xsl:with-param name="VALUE"
+										select="/*/configuration/evaluation-configuration/evaluator.statistics/@t-test-limit-p-value" />
+								</xsl:call-template>
+							</xsl:with-param>
+						</xsl:call-template>
+					
 					</table>
+
+
 				</div>
 
 				<div class="section">
