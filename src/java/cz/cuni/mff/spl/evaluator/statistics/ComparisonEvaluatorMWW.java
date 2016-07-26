@@ -107,12 +107,15 @@ public class ComparisonEvaluatorMWW {
         if (leftMeasurementSample.getMeasurement().getMeasurementState().isOk() && rightMeasurementSample.getMeasurement().getMeasurementState().isOk()) {
             if (leftMeasurementSample.getSampleCount() >= 2 && rightMeasurementSample.getSampleCount() >= 2) {
 
+            	double leftMedian = leftMeasurementSample.getMedian();
+            	double rightMedian = rightMeasurementSample.getMedian();
+
                 StatisticalSummary leftSummary = transformStatisticalSummary(leftMeasurementSample.getStatisticalSummary(),
                         getLambdaMultiplier(comparison.getLeftLambda()));
                 StatisticalSummary rightSummary = transformStatisticalSummary(rightMeasurementSample.getStatisticalSummary(),
                         getLambdaMultiplier(comparison.getRightLambda()));
                 double[] leftMeasurement = transformMeasuredArray(leftMeasurementSample, getLambdaMultiplier(comparison.getLeftLambda()));
-                double[] rightMeasurement = transformMeasuredArray(leftMeasurementSample, getLambdaMultiplier(comparison.getRightLambda()));
+                double[] rightMeasurement = transformMeasuredArray(rightMeasurementSample, getLambdaMultiplier(comparison.getRightLambda()));
 
 
                 return processComparison(comparison, leftSummary, rightSummary, 
@@ -254,12 +257,30 @@ public class ComparisonEvaluatorMWW {
         
     }
 
+	/**
+     * Transforms the input array with the provided lambda multiplier.
+     * Returned array is original measurement sample data multiplied by 
+     * lambda multiplier
+     * @param measurement
+     *       the measurement to transform
+     * @param lambdaMultipler
+     *      The lambda multiplier.
+     * @return The transformed measurement.
+     */
     public static double[] transformMeasuredArray(double[] array, double lambdaMultiplier){
         for (int i = 0; i < array.length; i++){
             array[i] *= lambdaMultiplier;
         }
         return array;
     }
+
+    public static double getMedian(double[] array){
+    	int n = array.length;
+    	int midPoint = n/2;
+    	double median = array[midPoint];
+    	return median;
+    }
+
 
     /**
      * Processes comparison of samples.
@@ -282,7 +303,7 @@ public class ComparisonEvaluatorMWW {
              double[] dataArray1, double[] dataArray2, Sign comparisonType) {
 
         if (measuredData1.getN() < 2 || measuredData2.getN() < 2) {
-            return ComparisonResult.createNotComputedComparisonResult("Not enough measurement samples for statistical t-test.");
+            return ComparisonResult.createNotComputedComparisonResult("Not enough measurement samples for statistical Mann Whitney Wilcoxon test.");
         }
 
         switch (comparisonType) {
@@ -314,20 +335,21 @@ public class ComparisonEvaluatorMWW {
                 }
             }
             case LT:
-                double mean1 = measuredData1.getMean();
-                double mean2 = measuredData2.getMean();
-                // see javadoc for tTest(...),
-                // it says "check first mean is less than second"
-                // and if so, than do t-test with double confidence
-                // or divide p-value by 2
-                if (mean1 < mean2) {
+                double median1 = getMedian(dataArray1);
+                double median2 = getMedian(dataArray2);
+                // need to divide answer by 2 for a one sided test
+                // first need to check that the test statistic is not in upper tail
+                if (median1 < median2) {
                     double pValueNegate = MWWTEST.mannWhitneyUTest(dataArray1, dataArray2) / 2.0;
-                    // t-test validation says, that both series means are equal
+                    // MWW test validation says, that both series means are equal
                     // but we don't want this result, we want negation
                     boolean result = !confidenceChecker.isPvalueAcceptable(pValueNegate);
+                    System.out.println("in ComparisonEvaluatorMWW  m1:" + median1 + " < m2 :" + median2);
                     return new ComparisonResult(pValueNegate, result);
                 } else {
                     // means are not in correct relation => it is certain
+                    System.out.println("in ComparisonEvaluatorMWW  m1:" + median1 + " >= m2 :" + median2);
+
                     return new ComparisonResult(0, false);
                 }
             case EQ:
