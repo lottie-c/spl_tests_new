@@ -107,22 +107,22 @@ public class ComparisonEvaluatorMWW {
         if (leftMeasurementSample.getMeasurement().getMeasurementState().isOk() && rightMeasurementSample.getMeasurement().getMeasurementState().isOk()) {
             if (leftMeasurementSample.getSampleCount() >= 2 && rightMeasurementSample.getSampleCount() >= 2) {
 
-            	double leftMedian = leftMeasurementSample.getMedian();
-            	double rightMedian = rightMeasurementSample.getMedian();
-
-                StatisticalSummary leftSummary = transformStatisticalSummary(leftMeasurementSample.getStatisticalSummary(),
-                        getLambdaMultiplier(comparison.getLeftLambda()));
-                StatisticalSummary rightSummary = transformStatisticalSummary(rightMeasurementSample.getStatisticalSummary(),
-                        getLambdaMultiplier(comparison.getRightLambda()));
+            	double leftMedian = transformMedianValue(leftMeasurementSample.getMedian(), getLambdaMultiplier(comparison.getLeftLambda()));
+            	double rightMedian = transformMedianValue(rightMeasurementSample.getMedian(), getLambdaMultiplier(comparison.getRightLambda()));
+                
                 double[] leftMeasurement = transformMeasuredArray(leftMeasurementSample, getLambdaMultiplier(comparison.getLeftLambda()));
                 double[] rightMeasurement = transformMeasuredArray(rightMeasurementSample, getLambdaMultiplier(comparison.getRightLambda()));
 
 
-                return processComparison(comparison, leftSummary, rightSummary, 
+                return processComparison(comparison, leftMedian, rightMedian, 
                     leftMeasurement, rightMeasurement, comparison.getSign());
             } else {
                 String errorMessage;
 
+				/*StatisticalSummary leftSummary = transformStatisticalSummary(leftMeasurementSample.getStatisticalSummary(),
+                        getLambdaMultiplier(comparison.getLeftLambda()));
+                StatisticalSummary rightSummary = transformStatisticalSummary(rightMeasurementSample.getStatisticalSummary(),
+                        getLambdaMultiplier(comparison.getRightLambda()));*/
                 MeasurementState leftMeasurementState = leftMeasurementSample.getMeasurement().getMeasurementState();
                 MeasurementState rightMeasurementState = rightMeasurementSample.getMeasurement().getMeasurementState();
 
@@ -274,6 +274,10 @@ public class ComparisonEvaluatorMWW {
         return array;
     }
 
+    public static double transformMedianValue(double median, double lambdaMultiplier){
+    	return median*lambdaMultiplier;
+    }
+
     public static double getMedian(double[] array){
     	int n = array.length;
     	int midPoint = n/2;
@@ -299,10 +303,10 @@ public class ComparisonEvaluatorMWW {
      * @see ComparisonResult
      * @see MannWhitneyUTest#MannWhitneyUTest(double[], double[])
      */
-    private ComparisonResult processComparison(Comparison comparison, StatisticalSummary measuredData1, StatisticalSummary measuredData2,
+    private ComparisonResult processComparison(Comparison comparison, double median1, double median2,
              double[] dataArray1, double[] dataArray2, Sign comparisonType) {
 
-        if (measuredData1.getN() < 2 || measuredData2.getN() < 2) {
+        if (dataArray1.length < 2 || dataArray2.length < 2) {
             return ComparisonResult.createNotComputedComparisonResult("Not enough measurement samples for statistical Mann Whitney Wilcoxon test.");
         }
 
@@ -310,21 +314,21 @@ public class ComparisonEvaluatorMWW {
             case EQI:
                 // this is the most complex case as we need to evaluate equality
                 // with interval check
-                return processIntervalEqualityComparison(comparison, measuredData2, 
-                	measuredData1, dataArray2, dataArray1);
+                return processIntervalEqualityComparison(comparison, median2, 
+                	median1, dataArray2, dataArray1);
 
             case GE:
                 // just swap values and test for LE
-                return processComparison(comparison, measuredData2, measuredData1,
+                return processComparison(comparison, median2, median1,
                  dataArray2, dataArray1, Sign.LE);
             case GT:
                 // just swap values and test for LT
-                return processComparison(comparison, measuredData2, measuredData1, 
+                return processComparison(comparison, median2, median1, 
                     dataArray2, dataArray1, Sign.LT);
             case LE: {
-                ComparisonResult lt = processComparison(comparison, measuredData1, measuredData2, 
+                ComparisonResult lt = processComparison(comparison, median1, median2, 
                     dataArray1, dataArray2, Sign.LT);
-                ComparisonResult eq = processComparison(comparison, measuredData1, measuredData2, 
+                ComparisonResult eq = processComparison(comparison, median1, median2, 
                     dataArray1, dataArray2, Sign.EQ);
                 if (lt.isSatisfied() && eq.isSatisfied()) {
                     return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
@@ -335,8 +339,7 @@ public class ComparisonEvaluatorMWW {
                 }
             }
             case LT:
-                double median1 = getMedian(dataArray1);
-                double median2 = getMedian(dataArray2);
+                
                 // need to divide answer by 2 for a one sided test
                 // first need to check that the test statistic is not in upper tail
                 if (median1 < median2) {
@@ -375,27 +378,27 @@ public class ComparisonEvaluatorMWW {
      * @return The comparison result.
      */
     private ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
-        StatisticalSummary measuredData2, StatisticalSummary measuredData1, 
+        double median2, double median1, 
         double[] dataArray1, double[] dataArray2) {
 
         Double interval = comparison.getInterval();
         interval = interval != null ? interval : configuration.getEqualityInterval();
 
-        StatisticalSummary leftLowerSummary = transformStatisticalSummary(measuredData1, 1.0d - interval);
-        StatisticalSummary rightLowerSummary = transformStatisticalSummary(measuredData2, 1.0d + interval);
+        double leftLowerMedian = transformMedianValue(median1, 1.0d - interval);
+        double rightLowerMedian = transformMedianValue(median2, 1.0d + interval);
 
         double[] leftLowerMeasurement = transformMeasuredArray(dataArray1, 1.0d - interval);
         double[] rightLowerMeasurement = transformMeasuredArray(dataArray2, 1.0d + interval);
 
-        StatisticalSummary leftGreaterSummary = transformStatisticalSummary(measuredData1, 1.0d + interval);
-        StatisticalSummary rightGreaterSummary = transformStatisticalSummary(measuredData2, 1.0d - interval);
+        double leftGreaterMedian = transformMedianValue(median1, 1.0d + interval);
+        double rightGreaterMedian = transformMedianValue(median2, 1.0d - interval);
 
         double[] leftGreaterMeasurement = transformMeasuredArray(dataArray1, 1.0d + interval);
         double[] rightGreaterMeasurement = transformMeasuredArray(dataArray2, 1.0d - interval);
 
-        ComparisonResult lowerResult = processComparison(comparison, leftLowerSummary, rightLowerSummary,
+        ComparisonResult lowerResult = processComparison(comparison, leftLowerMedian, rightLowerMedian,
             leftLowerMeasurement, rightLowerMeasurement,  Sign.LE);
-        ComparisonResult greaterResult = processComparison(comparison, leftGreaterSummary, rightGreaterSummary,
+        ComparisonResult greaterResult = processComparison(comparison, leftGreaterMedian, rightGreaterMedian,
             leftGreaterMeasurement, rightGreaterMeasurement, Sign.GE);
 
         // combine results if satisfied, or return the one that failed
