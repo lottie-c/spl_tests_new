@@ -93,7 +93,7 @@
 		<path location="${lib.dir}/svnkit/svnkit-javahl16-1.7.5-v1.jar"/>
 		<path location="${lib.dir}/svnkit/trilead-ssh2-1.0.0-build215.jar"/>		
 		
-		<path location="${lib.dir}/evaluator/commons-math3-3.1.1.jar"/>
+		<path location="${lib.dir}/evaluator/commons-math3-3.6.1.jar"/>
 		<path location="${lib.dir}/evaluator/jcommon-1.0.18.jar"/>
 		<path location="${lib.dir}/evaluator/jfreechart-1.0.14.jar"/>
 	</path>

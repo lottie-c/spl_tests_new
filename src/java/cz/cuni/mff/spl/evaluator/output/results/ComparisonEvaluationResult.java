@@ -47,9 +47,9 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
     /** The comparison result performing a Mann Whitney U test. */
     private ComparisonResult    comparisonResultMWW;
 
-    /** The comparison result performing a Kolmogorov Smirnov test. 
+    /** The comparison result performing a Kolmogorov Smirnov test. */
     private ComparisonResult comparisonResultKS;
-    */
+    
 
     /** The left measurement sample. */
     public MeasurementSample leftMeasurementSample;
@@ -79,7 +79,7 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
         this.comparison = comparison;
         this.comparisonResult = comparisonResult;
         this.comparisonResultMWW = comparisonResultMWW;
-        /*this.comparisonResultKS = comparisonResultKS;*/
+        this.comparisonResultKS = comparisonResultKS;
         this.leftMeasurementSample = leftMeasurementSample;
         this.rightMeasurementSample = rightMeasurementSample;
     }
@@ -107,10 +107,10 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
         return this.comparisonResultMWW;
     }
 
-    /*
+    
     public ComparisonResult getComparisonResultKS() {
         return this.comparisonResultKS;
-    }*/
+    }
 
     public Comparison getComparison() {
         return this.comparison;
@@ -133,9 +133,9 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
         return comparisonResultMWW.getStatisticalResult();
     }
 
-    /*public StatisticalResult getStatisticalResultKS() {
+    public StatisticalResult getStatisticalResultKS() {
         return comparisonResultKS.getStatisticalResult();
-    }*/
+    }
 
     @Override
     public int hashCode() {

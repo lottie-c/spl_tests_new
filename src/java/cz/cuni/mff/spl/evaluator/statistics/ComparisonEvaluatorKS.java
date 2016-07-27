@@ -27,10 +27,14 @@
  */
 package cz.cuni.mff.spl.evaluator.statistics;
 
+
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues;
 import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
 
+
+
+import cz.cuni.mff.spl.evaluator.statistics.KolmogorovSmirnovTestFlag;
 import cz.cuni.mff.spl.annotation.Comparison;
 import cz.cuni.mff.spl.annotation.Lambda;
 import cz.cuni.mff.spl.annotation.MeasurementState;
@@ -47,10 +51,10 @@ import cz.cuni.mff.spl.evaluator.input.MeasurementDataProvider.MeasurementDataNo
  * @author Martin Lacina
  * 
  */
-public class ComparisonEvaluatorMWW {
+public class ComparisonEvaluatorKS {
 
     /** The TTest singleton instance to be used. */
-    private static final MannWhitneyUTest              MWWTEST = new MannWhitneyUTest();
+    private static final KolmogorovSmirnovTestFlag              KSTEST = new KolmogorovSmirnovTestFlag();
 
     /** The confidence to be used for p-value comparison. */
     private final StatisticValueChecker     confidenceChecker;
@@ -65,7 +69,7 @@ public class ComparisonEvaluatorMWW {
      *            The configuration.
      * @param checker
      */
-    public ComparisonEvaluatorMWW(SplEvaluatorConfiguration configuration, StatisticValueChecker checker) {
+    public ComparisonEvaluatorKS(SplEvaluatorConfiguration configuration, StatisticValueChecker checker) {
         this.configuration = configuration;
         this.confidenceChecker = checker;
     }
@@ -107,22 +111,16 @@ public class ComparisonEvaluatorMWW {
         if (leftMeasurementSample.getMeasurement().getMeasurementState().isOk() && rightMeasurementSample.getMeasurement().getMeasurementState().isOk()) {
             if (leftMeasurementSample.getSampleCount() >= 2 && rightMeasurementSample.getSampleCount() >= 2) {
 
-            	double leftMedian = transformMedianValue(leftMeasurementSample.getMedian(), getLambdaMultiplier(comparison.getLeftLambda()));
-            	double rightMedian = transformMedianValue(rightMeasurementSample.getMedian(), getLambdaMultiplier(comparison.getRightLambda()));
-                
+        
                 double[] leftMeasurement = transformMeasuredArray(leftMeasurementSample, getLambdaMultiplier(comparison.getLeftLambda()));
                 double[] rightMeasurement = transformMeasuredArray(rightMeasurementSample, getLambdaMultiplier(comparison.getRightLambda()));
 
 
-                return processComparison(comparison, leftMedian, rightMedian, 
+                return processComparison(comparison, 
                     leftMeasurement, rightMeasurement, comparison.getSign());
             } else {
                 String errorMessage;
 
-				/*StatisticalSummary leftSummary = transformStatisticalSummary(leftMeasurementSample.getStatisticalSummary(),
-                        getLambdaMultiplier(comparison.getLeftLambda()));
-                StatisticalSummary rightSummary = transformStatisticalSummary(rightMeasurementSample.getStatisticalSummary(),
-                        getLambdaMultiplier(comparison.getRightLambda()));*/
                 MeasurementState leftMeasurementState = leftMeasurementSample.getMeasurement().getMeasurementState();
                 MeasurementState rightMeasurementState = rightMeasurementSample.getMeasurement().getMeasurementState();
 
@@ -198,40 +196,6 @@ public class ComparisonEvaluatorMWW {
         }
     }
 
-    /**
-     * Transforms the statistical summary with provided lambda multiplier.
-     * Returned statistical summary represents original measurement sample data
-     * multiplied by lambda multiplier.
-     * 
-     * In fact only statistical adjustment with lambda multiplier is done in
-     * 
-     * @param statisticalSummary
-     *            The statistical summary to transform.
-     * @param lambdaMultiplier
-     *            The lambda multiplier.
-     * @return The transformed statistical summary.
-     *         {@link StatisticalSummaryValues#StatisticalSummaryValues(double, double, long, double, double, double)}
-     *         :
-     *         <ul>
-     *         <li>Sample count is unchanged.</li>
-     *         <li>Mean, maximum, minimum and sum are multiplied with lambda
-     *         multiplier.</li>
-     *         <li>Variance is multiplied with lambda multiplier twice as
-     *         standard deviation is square root of variance and it would need
-     *         only one multiplication with lambda multiplier.</li>
-     *         </ul>
-     * 
-     *         Note than slight difference in counted values will be always
-     *         present due
-     *         to double arithmetics as statistical values are not computed from
-     *         multiplied data directly.
-     */
-    public static StatisticalSummary transformStatisticalSummary(StatisticalSummary statisticalSummary, double lambdaMultiplier) {
-        return new StatisticalSummaryValues(lambdaMultiplier * statisticalSummary.getMean(), lambdaMultiplier * lambdaMultiplier
-                * statisticalSummary.getVariance(),
-                statisticalSummary.getN(),
-                lambdaMultiplier * statisticalSummary.getMax(), lambdaMultiplier * statisticalSummary.getMin(), lambdaMultiplier * statisticalSummary.getSum());
-    }
 
     /**
      * Transforms the measured array with the provided lambda multiplier.
@@ -250,7 +214,7 @@ public class ComparisonEvaluatorMWW {
         	double[] data = measurement.getSampleDataProvider().loadRawData(lambdaMultiplier);
         	return data;
     	}catch (MeasurementDataNotFoundException e){
-    		System.out.println("Error obtaining raw data for MWW test: " + e);
+    		System.out.println("Error obtaining raw data for KS test: " + e);
     		double[] data = {-1};
     		return data;
     	}
@@ -274,9 +238,6 @@ public class ComparisonEvaluatorMWW {
         return array;
     }
 
-    public static double transformMedianValue(double median, double lambdaMultiplier){
-    	return median*lambdaMultiplier;
-    }
 
     /**
      * Processes comparison of samples.
@@ -295,8 +256,8 @@ public class ComparisonEvaluatorMWW {
      * @see ComparisonResult
      * @see MannWhitneyUTest#MannWhitneyUTest(double[], double[])
      */
-    private ComparisonResult processComparison(Comparison comparison, double median1, double median2,
-             double[] dataArray1, double[] dataArray2, Sign comparisonType) {
+    private ComparisonResult processComparison(Comparison comparison, double[] dataArray1,
+     double[] dataArray2, Sign comparisonType) {
 
         if (dataArray1.length < 2 || dataArray2.length < 2) {
             return ComparisonResult.createNotComputedComparisonResult("Not enough measurement samples for statistical Mann Whitney Wilcoxon test.");
@@ -306,21 +267,21 @@ public class ComparisonEvaluatorMWW {
             case EQI:
                 // this is the most complex case as we need to evaluate equality
                 // with interval check
-                return processIntervalEqualityComparison(comparison, median2, 
-                	median1, dataArray2, dataArray1);
+                return processIntervalEqualityComparison(comparison,
+                    dataArray2, dataArray1);
 
             case GE:
                 // just swap values and test for LE
-                return processComparison(comparison, median2, median1,
+                return processComparison(comparison,
                  dataArray2, dataArray1, Sign.LE);
             case GT:
                 // just swap values and test for LT
-                return processComparison(comparison, median2, median1, 
+                return processComparison(comparison, 
                     dataArray2, dataArray1, Sign.LT);
             case LE: {
-                ComparisonResult lt = processComparison(comparison, median1, median2, 
+                ComparisonResult lt = processComparison(comparison, 
                     dataArray1, dataArray2, Sign.LT);
-                ComparisonResult eq = processComparison(comparison, median1, median2, 
+                ComparisonResult eq = processComparison(comparison,
                     dataArray1, dataArray2, Sign.EQ);
                 if (lt.isSatisfied() && eq.isSatisfied()) {
                     return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
@@ -334,18 +295,23 @@ public class ComparisonEvaluatorMWW {
                 
                 // need to divide answer by 2 for a one sided test
                 // first need to check that the test statistic is not in upper tail
-                if (median1 < median2) {
-                    double pValueNegate = MWWTEST.mannWhitneyUTest(dataArray1, dataArray2) / 2.0;
-                    // MWW test validation says, that both series means are equal
+
+                double[] testOutput = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2);
+                double testPValue = testOutput[0];
+                double negFlag = testOutput[1];
+                if (negFlag == 0) {
+                    double pValueNegate = testPValue / 2.0;
+                    // KS test validation says, that both series means are equal
                     // but we don't want this result, we want negation
                     boolean result = !confidenceChecker.isPvalueAcceptable(pValueNegate);
                     return new ComparisonResult(pValueNegate, result);
                 } else {
-                    // medians are not in correct relation => it is certain
+                    // the largest difference between the distributions is negative
+                    // hence dataArray2 likely lies to the left of dataArray1
                     return new ComparisonResult(0, false);
                 }
             case EQ:
-                double pValue = MWWTEST.mannWhitneyUTest(dataArray1, dataArray2);
+                double pValue = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2)[0];
                 boolean acceptable = confidenceChecker.isPvalueAcceptable(pValue);
                 return new ComparisonResult(pValue, acceptable);
             default:
@@ -367,27 +333,20 @@ public class ComparisonEvaluatorMWW {
      * @return The comparison result.
      */
     private ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
-        double median2, double median1, 
         double[] dataArray1, double[] dataArray2) {
 
         Double interval = comparison.getInterval();
         interval = interval != null ? interval : configuration.getEqualityInterval();
 
-        double leftLowerMedian = transformMedianValue(median1, 1.0d - interval);
-        double rightLowerMedian = transformMedianValue(median2, 1.0d + interval);
-
         double[] leftLowerMeasurement = transformMeasuredArray(dataArray1, 1.0d - interval);
         double[] rightLowerMeasurement = transformMeasuredArray(dataArray2, 1.0d + interval);
-
-        double leftGreaterMedian = transformMedianValue(median1, 1.0d + interval);
-        double rightGreaterMedian = transformMedianValue(median2, 1.0d - interval);
 
         double[] leftGreaterMeasurement = transformMeasuredArray(dataArray1, 1.0d + interval);
         double[] rightGreaterMeasurement = transformMeasuredArray(dataArray2, 1.0d - interval);
 
-        ComparisonResult lowerResult = processComparison(comparison, leftLowerMedian, rightLowerMedian,
+        ComparisonResult lowerResult = processComparison(comparison,
             leftLowerMeasurement, rightLowerMeasurement,  Sign.LE);
-        ComparisonResult greaterResult = processComparison(comparison, leftGreaterMedian, rightGreaterMedian,
+        ComparisonResult greaterResult = processComparison(comparison,
             leftGreaterMeasurement, rightGreaterMeasurement, Sign.GE);
 
         // combine results if satisfied, or return the one that failed
