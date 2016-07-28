@@ -47,7 +47,7 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
     /** The comparison result performing a Mann Whitney U test. */
     private ComparisonResult    comparisonResultMWW;
 
-    /** The comparison result performing a Kolmogorov Smirnov test. */
+    /** The comparison result performing a Kolmogorov Smirnov test.*/
     private ComparisonResult comparisonResultKS;
     
 
@@ -70,12 +70,9 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
      *            The right measurement sample.
      */
     
-    /* public ComparisonEvaluationResult(Comparison comparison, ComparisonResult comparisonResult, 
-        ComparisonResult comparisonResultMWW, ComparisonResult comparisonResultKS, MeasurementSample leftMeasurementSample,
-            MeasurementSample rightMeasurementSample)*/
     public ComparisonEvaluationResult(Comparison comparison, ComparisonResult comparisonResult, 
-        ComparisonResult comparisonResultMWW, MeasurementSample leftMeasurementSample,
-            MeasurementSample rightMeasurementSample) {
+        ComparisonResult comparisonResultMWW, ComparisonResult comparisonResultKS, MeasurementSample leftMeasurementSample,
+        MeasurementSample rightMeasurementSample) {
         this.comparison = comparison;
         this.comparisonResult = comparisonResult;
         this.comparisonResultMWW = comparisonResultMWW;
@@ -107,7 +104,7 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
         return this.comparisonResultMWW;
     }
 
-    
+
     public ComparisonResult getComparisonResultKS() {
         return this.comparisonResultKS;
     }
@@ -220,11 +217,11 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
      * 
      * @param comparisonResult
      *            The new comparison result.
-     *
-     *public void setComparisonResultKS(ComparisonResult comparisonResultKS) {
-     *   this.comparisonResultKS = comparisonResultKS;
-     * }
      */
+     public void setComparisonResultKS(ComparisonResult comparisonResultKS) {
+        this.comparisonResultKS = comparisonResultKS;
+      }
+     
 
     /**
      * Sets the left measurement sample.

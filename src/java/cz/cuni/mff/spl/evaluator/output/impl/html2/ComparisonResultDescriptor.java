@@ -37,8 +37,8 @@ import cz.cuni.mff.spl.evaluator.output.impl.html2.MeasurementResultDescriptor.M
 import cz.cuni.mff.spl.evaluator.output.results.ComparisonEvaluationResult;
 import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluator;
 import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorMWW;
-/*import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorKS;
-*/
+import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorKS;
+
 
 import cz.cuni.mff.spl.evaluator.statistics.MeasurementSample;
 import cz.cuni.mff.spl.evaluator.statistics.StatisticValueChecker;

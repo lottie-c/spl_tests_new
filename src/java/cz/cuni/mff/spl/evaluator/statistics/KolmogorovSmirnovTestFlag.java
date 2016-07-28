@@ -288,14 +288,14 @@ public class KolmogorovSmirnovTestFlag {
             double[] testOutput = kolmogorovSmirnovStatisticFlag(xa, ya);
             double testStat = testOutput[0];
    
-            double[] output = new double[1];
+            double[] output = new double[2];
             output[0] = exactP(testStat, x.length, y.length, strict);
             output[1] = testOutput[1];
             return output;
         }
         double[] testOutput = kolmogorovSmirnovStatisticFlag(x, y);
         double testStat = testOutput[0];
-        double[] output = new double[1];
+        double[] output = new double[2];
         output[0] = exactP(testStat, x.length, y.length, strict);
         output[1] = testOutput[1];
         return output;

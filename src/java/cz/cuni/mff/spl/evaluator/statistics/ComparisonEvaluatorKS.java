@@ -28,12 +28,6 @@
 package cz.cuni.mff.spl.evaluator.statistics;
 
 
-import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
-import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues;
-import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
-
-
-
 import cz.cuni.mff.spl.evaluator.statistics.KolmogorovSmirnovTestFlag;
 import cz.cuni.mff.spl.annotation.Comparison;
 import cz.cuni.mff.spl.annotation.Lambda;
@@ -54,7 +48,8 @@ import cz.cuni.mff.spl.evaluator.input.MeasurementDataProvider.MeasurementDataNo
 public class ComparisonEvaluatorKS {
 
     /** The TTest singleton instance to be used. */
-    private static final KolmogorovSmirnovTestFlag              KSTEST = new KolmogorovSmirnovTestFlag();
+    private static final KolmogorovSmirnovTestFlag              
+        KSTEST = new KolmogorovSmirnovTestFlag();
 
     /** The confidence to be used for p-value comparison. */
     private final StatisticValueChecker     confidenceChecker;
@@ -108,7 +103,7 @@ public class ComparisonEvaluatorKS {
      */
     public ComparisonResult evaluate(Comparison comparison, MeasurementSample leftMeasurementSample,
      MeasurementSample rightMeasurementSample) {
-        if (leftMeasurementSample.getMeasurement().getMeasurementState().isOk() && rightMeasurementSample.getMeasurement().getMeasurementState().isOk()) {
+            if (leftMeasurementSample.getMeasurement().getMeasurementState().isOk() && rightMeasurementSample.getMeasurement().getMeasurementState().isOk()) {
             if (leftMeasurementSample.getSampleCount() >= 2 && rightMeasurementSample.getSampleCount() >= 2) {
 
         

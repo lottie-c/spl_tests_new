@@ -48,7 +48,7 @@ import cz.cuni.mff.spl.evaluator.output.results.FormulaEvaluationResult;
 import cz.cuni.mff.spl.evaluator.output.results.LogicalOperationEvaluationResult;
 import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluator;
 import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorMWW;
-/*import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorKS*/
+import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorKS;
 import cz.cuni.mff.spl.evaluator.statistics.MeasurementSample;
 import cz.cuni.mff.spl.evaluator.statistics.StatisticValueChecker;
 
@@ -61,19 +61,19 @@ import cz.cuni.mff.spl.evaluator.statistics.StatisticValueChecker;
 class EvaluatorImpl {
 
     /** The sample provider. */
-    private final MeasurementSampleProvider measurementSampleProvider;
+    private final MeasurementSampleProvider     measurementSampleProvider;
 
     /** The comparison evaluator for the t test. */
-    private final ComparisonEvaluator       comparisonEvaluator;
+    private final ComparisonEvaluator           comparisonEvaluator;
 
     /** The comparison evaluator for the mann whitney u test*/
-    private final ComparisonEvaluatorMWW       comparisonEvaluatorMWW;
+    private final ComparisonEvaluatorMWW        comparisonEvaluatorMWW;
 
    /*
-     The comparison evaluator for the Kolmogorov Smirnov test
-     private final ComparisonEvaluatorKS      comparisonEvaluatorKS;
+     The comparison evaluator for the Kolmogorov Smirnov test*/
+     private final ComparisonEvaluatorKS        comparisonEvaluatorKS;
 
-   */
+   
 
     /**
      * Instantiates a new evaluator.
@@ -89,8 +89,7 @@ class EvaluatorImpl {
         this.measurementSampleProvider = measurementSampleProvider;
         this.comparisonEvaluator = new ComparisonEvaluator(configuration, checker);
         this.comparisonEvaluatorMWW = new ComparisonEvaluatorMWW(configuration, checker);
-        /*this.comparisonEvaluatorKS = new ComparisonEvaluatorKS(configuration, checker);*/
-
+        this.comparisonEvaluatorKS = new ComparisonEvaluatorKS(configuration, checker);
     }
 
     /**
@@ -223,10 +222,9 @@ class EvaluatorImpl {
 
         ComparisonResult comparisonResult = comparisonEvaluator.evaluate(formula, leftSample, rightSample);
         ComparisonResult comparisonResultMWW = comparisonEvaluatorMWW.evaluate(formula, leftSample, rightSample);
-        /*ComparisonResult comparisonResultKS = comparisonEvaluatorKS.evaluate(formula, leftSample, rightSample);*/
-        result = new ComparisonEvaluationResult(formula, comparisonResult, comparisonResultMWW ,  leftSample, rightSample);
-        /*result = new ComparisonEvaluationResult(formula, comparisonResult, comparisonResultMWW , comparisonResultKS, 
-            leftSample, rightSample);*/
+        ComparisonResult comparisonResultKS = comparisonEvaluatorKS.evaluate(formula, leftSample, rightSample);
+        result = new ComparisonEvaluationResult(formula, comparisonResult, comparisonResultMWW , comparisonResultKS, 
+            leftSample, rightSample);
         outputProvider.generateComparisonOutput(result);
         releaseDataOnSamples(leftSample, rightSample);
 
