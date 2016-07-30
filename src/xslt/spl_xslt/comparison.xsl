@@ -70,6 +70,8 @@
 			select="$comparisonResult/comparison-result/@result" />
 		<xsl:variable name="statisticalResultMWW"
 			select="$comparisonResult/comparison-result-MWW/@result" />
+		<xsl:variable name="statisticalResultKS"
+			select="$comparisonResult/comparison-result-KS/@result" />
 		<xsl:choose>
 			<xsl:when test="$statisticalResult = 'NOT_COMPUTED'">
 				<div class="section">
@@ -99,6 +101,8 @@
 			<xsl:when test="$statisticalResult = ('OK', 'FAILED')">
 				<xsl:variable name="isSatisfied" select="$statisticalResult eq 'OK'" />
 				<xsl:variable name="isSatisfiedMWW" select="$statisticalResultMWW eq 'OK'" />
+
+				<xsl:variable name="isSatisfiedKS" select="$statisticalResultKS eq 'OK'" />
 			
 				<div class="section">
 
@@ -157,6 +161,33 @@
 								</xsl:call-template>
 							</xsl:with-param>
 						</xsl:call-template>
+
+						<xsl:call-template name="PRINTER.tableRow">
+							<xsl:with-param name="KEY"
+								select="'KS test Comparison evalution result'" />
+							<xsl:with-param name="VALUE" select="$statisticalResultKS" />
+							<xsl:with-param name="VALID" select="$isSatisfiedKS" />
+						</xsl:call-template>
+						<xsl:call-template name="PRINTER.tableRow">
+							<xsl:with-param name="KEY" select="'KS test p-value'" />
+							<xsl:with-param name="VALUE">
+								<xsl:call-template name="PRINTER.format.pvalue">
+									<xsl:with-param name="VALUE"
+										select="$comparisonResult/comparison-result-KS/@pValue" />
+								</xsl:call-template>
+							</xsl:with-param>
+							<xsl:with-param name="VALID" select="$isSatisfiedKS" />
+						</xsl:call-template>
+						<xsl:call-template name="PRINTER.tableRow">
+							<xsl:with-param name="KEY" select="'KS limit p-value'" />
+							<xsl:with-param name="VALUE">
+								<xsl:call-template name="PRINTER.format.pvalue">
+									<xsl:with-param name="VALUE"
+										select="/*/configuration/evaluation-configuration/evaluator.statistics/@t-test-limit-p-value" />
+								</xsl:call-template>
+							</xsl:with-param>
+						</xsl:call-template>
+
 					
 					</table>
 

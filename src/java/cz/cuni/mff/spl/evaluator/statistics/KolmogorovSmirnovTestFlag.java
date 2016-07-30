@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+/*Code altered by Lottie Carruthers*/
+
 package cz.cuni.mff.spl.evaluator.statistics;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -343,8 +345,10 @@ public class KolmogorovSmirnovTestFlag {
     }
 
     public double[] kolmogorovSmirnovStatisticFlag(double[] x, double[] y) {
-        double[] output = integralKolmogorovSmirnovStatisticFlag(x, y);
+        long[] results = integralKolmogorovSmirnovStatisticFlag(x, y);
+        double[] output = new double[2];
         output[0] = output[0]/((double)(x.length * (long)y.length));
+        output[1] = (double)results[1];
 
         return output;
     }
@@ -365,7 +369,7 @@ public class KolmogorovSmirnovTestFlag {
      * @throws NullArgumentException if either {@code x} or {@code y} is null
      */
     
-    private double[] integralKolmogorovSmirnovStatisticFlag(double[] x, double[] y) {
+    private long[] integralKolmogorovSmirnovStatisticFlag(double[] x, double[] y) {
         checkArray(x);
         checkArray(y);
         // Copy and sort the sample arrays
@@ -374,7 +378,7 @@ public class KolmogorovSmirnovTestFlag {
         Arrays.sort(sx);
         Arrays.sort(sy);
 
-        int negFlag = 0;
+        long negFlag = 0l;
 
         final int n = sx.length;
         final int m = sy.length;
@@ -396,17 +400,18 @@ public class KolmogorovSmirnovTestFlag {
                 curD -= n;
             }
             if (curD > supD) {
-                negFlag = 0;
+                negFlag = 0l;
                 supD = curD;
             }
+            //the current largest difference is -ve and hence y lies left of x
             else if (-curD > supD) {
-                negFlag = 1;
+                negFlag = 1l;
                 supD = -curD;
             }
         } while(rankX < n && rankY < m);
-        double[] output = new double[2];
-        output[0] = (double)supD;
-        output[1] = (double)negFlag;
+        long[] output = new long[2];
+        output[0] = supD;
+        output[1] = negFlag;
         return output;
     }
 
