@@ -48,6 +48,9 @@ public class GraphProvider {
     /** The density graph creator. */
     private ProbabilityDensityGraphCreator densityGraphCreator;
 
+    /**The Empirical Distribution graph creator*/
+    private EdfCreator                      edfCreator;
+
     /** The working directory. */
     private final File                     workingDirectory;
 
@@ -76,6 +79,8 @@ public class GraphProvider {
                 break;
             case TimeDiagram:
                 return getTimeGraphCreator().createTimeDiagramGraph(graphDefinition, samples);
+            case Edf:
+                return getEdfCreator().createEdfGraph(graphDefinition, samples);
             default:
                 break;
         }
@@ -138,6 +143,19 @@ public class GraphProvider {
         }
         return timeGraphCreator;
     }
+
+    /**
+     * Gets the Empirical Distribution graph creator.
+     * 
+     * @return The Empirical Distribution graph creator.
+     */
+    private EdfCreator getEdfCreator() {
+        if (edfCreator == null) {
+            edfCreator = new EdfCreator(graphUtils);
+        }
+        return edfCreator;
+    }
+
 
     /**
      * Gets the density graph creator.

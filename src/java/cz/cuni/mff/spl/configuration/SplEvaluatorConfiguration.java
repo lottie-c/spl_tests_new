@@ -267,7 +267,11 @@ public class SplEvaluatorConfiguration {
                 createGraphDefinition(GraphType.DensityComparison, DataClipType.Sigma, 3.0, 1.0),
 
                 // GraphTypes.TwoSamples_QuantileClippedCompleteHistogram_001_999
-                createGraphDefinition(GraphType.Histogram, DataClipType.Quantile, 0.1, 99.9)
+                createGraphDefinition(GraphType.Histogram, DataClipType.Quantile, 0.1, 99.9),
+                
+                /*createGraphDefinition(HERE INSERT EDF COMPARISON GRAPH)*/
+                createGraphDefinition(GraphType.Edf, DataClipType.Quantile, 0.1, 99.9)
+                
                 );
     }
 

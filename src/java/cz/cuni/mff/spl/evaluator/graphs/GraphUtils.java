@@ -40,6 +40,8 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYSeries;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
 
 import cz.cuni.mff.spl.configuration.SplEvaluatorConfiguration;
 import cz.cuni.mff.spl.deploy.build.SampleIdentification;
@@ -173,6 +175,66 @@ public class GraphUtils {
         configureAxisWithDefaults(chart.getXYPlot().getRangeAxis(), textColor);
 
     }
+
+ /**
+     * Configures chart with defaults.
+     * 
+     * @param chart
+     *            The chart to configure.
+     */
+    public void configureEdfChartWithDefaults(JFreeChart chart) {
+
+        CategoryItemRenderer renderer = chart.getCategoryPlot().getRenderer();
+
+        /*if (renderer instanceof XYBarRenderer) {
+            ((XYBarRenderer) renderer).setDrawBarOutline(true);
+            ((XYBarRenderer) renderer).setShadowVisible(false);
+        }*/
+
+        Color background = configuration.getGraphBackgroundColor();
+        if (configuration.isGraphBackgroundTransparent()) {
+            chart.setBackgroundPaint(background);
+            chart.setBackgroundImageAlpha(configuration.getGraphBackgroundColor().getRGBComponents(null)[3]);
+        } else {
+            chart.setBackgroundPaint(configuration.getGraphBackgroundColor());
+        }
+
+        chart.getCategoryPlot().getRenderer().setBaseItemLabelPaint(Color.orange);
+
+        int colorIndex = 0;
+        for (Color c : configuration.getGraphSampleColors()) {
+            renderer.setSeriesPaint(colorIndex, c);
+            renderer.setSeriesOutlinePaint(colorIndex, c);
+            ++colorIndex;
+        }
+
+        // configure text color
+        Color textColor = configuration.getGraphTextColor();
+
+        TextTitle title = chart.getTitle();
+        if (title != null) {
+            title.setPaint(textColor);
+        }
+
+        for (Object subtitleObject : chart.getSubtitles()) {
+            if (subtitleObject instanceof TextTitle) {
+                ((TextTitle) subtitleObject).setPaint(textColor);
+            }
+        }
+
+        LegendTitle legend = chart.getLegend();
+        if (legend != null) {
+            legend.setItemPaint(textColor);
+            if (textColor.equals(legend.getBackgroundPaint())) {
+                legend.setBackgroundPaint(background);
+            }
+        }
+
+        configureAxisWithDefaults(chart.getCategoryPlot().getDomainAxis(), textColor);
+        configureAxisWithDefaults(chart.getCategoryPlot().getRangeAxis(), textColor);
+
+    }
+
 
     /**
      * Configures axis with defaults.

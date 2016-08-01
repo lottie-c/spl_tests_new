@@ -79,6 +79,14 @@ public class GraphDefinition extends AbstractXmlTransformationReference {
             public String toPrettyString() {
                 return "Density comparison";
             }
+        },
+
+        /** The EmpiricalDistribution comparison graph type. */
+        Edf {
+            @Override
+            public String toPrettyString() {
+                return "Empirical Distribution Comparison";
+            }
         };
         public abstract String toPrettyString();
 
