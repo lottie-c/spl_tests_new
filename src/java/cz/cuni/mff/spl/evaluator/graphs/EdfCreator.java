@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Collections;
 
-//import org.apache.commons.math3.random.EmpiricalDistribution;
+import org.apache.commons.math3.random.EmpiricalDistribution;
 
 
 
@@ -60,16 +60,6 @@ public class EdfCreator {
     /** The graph utilities to use. */
     private final GraphUtils graphUtils;
 
-    /** The default minimum histogram bin count. */
-    public static final int  DEFAULT_MINIMUM_BIN_COUNT = 100;
-
-    /** The default minimum histogram bin count. */
-    public static final int  DEFAULT_MAXIMUM_BIN_COUNT = 10000;
-
-    /** The minimum histogram bin count. */
-    private final int        minimumBinCount;
-    /** The minimum histogram bin count. */
-    private final int        maximumBinCount;
 
     /**
      * Instantiates a new histogram graph creator.
@@ -85,11 +75,7 @@ public class EdfCreator {
      *            The maximum histogram bin count.
      */
     public EdfCreator(GraphUtils graphUtils) {
-        int minBinCount = graphUtils.getConfiguration().getHistogramMaximumBinCount();
-        int maxBinCount = graphUtils.getConfiguration().getHistogramMinimumBinCount();
         this.graphUtils = graphUtils;
-        this.minimumBinCount = Math.max(DEFAULT_MINIMUM_BIN_COUNT, Math.min(minBinCount, maxBinCount));
-        this.maximumBinCount = Math.min(DEFAULT_MAXIMUM_BIN_COUNT, Math.max(minBinCount, maxBinCount));
     }
 
     /**
@@ -119,9 +105,8 @@ public class EdfCreator {
         for (EdfSeries oneData : data) {
             
             for (int i = 0; i < oneData.data.length; i++){
-                dataset.addValue((Number)oneData.data[i], oneData.title, i + oneData.min);
-            /*dataset.addSeries(oneData.title, oneData.data,
-                    binCount);*/
+                // x axis is i + min - 1, -1 is so you start at 0
+                dataset.addValue( (Number)(oneData.data[i][0] ) , oneData.title, oneData.data[i][1]);
             }
         }
         PlotOrientation orientation = PlotOrientation.VERTICAL;
@@ -145,7 +130,7 @@ public class EdfCreator {
     public static class EdfSeries {
 
         /** The series data. */
-        public final double[] data;
+        public final double[][] data;
 
         /** The series title. */
         public final String   title;
@@ -161,7 +146,7 @@ public class EdfCreator {
          * @param data
          *            The series data.
          */
-        public EdfSeries(String title, double[] data, double min) {
+        public EdfSeries(String title, double[][] data, double min) {
             this.data = data;
             this.title = title;
             this.min = min;
@@ -203,13 +188,16 @@ public class EdfCreator {
                             max = clippedData[i];
                         }
                     }
-                    int range = (int)(max - min);
-                    EmpiricalDistribution dist = new EmpiricalDistribution();
-                    double[] empiricalDist = dist.load(clippedData); 
-                    data.add(new EdfSeries(sample.getSpecification(), empiricalDist, min));
-                    binCount = range;
+                    int numBins = clippedData.length/10;
+                    /*EmpiricalDistribution dist = new EmpiricalDistribution(numBins);
+                    dist.load(clippedData); 
+                   */
+                    EmpiricalDistributionNew dist = new EmpiricalDistributionNew(numBins);
+                    double[][] output = dist.load(clippedData);
+                    data.add(new EdfSeries(sample.getSpecification(), output, min));
+                    //binCount = range;
                 } catch (MeasurementDataNotFoundException e) {
-                    data.add(new EdfSeries("Measurement sample data not found: " + sample.getSpecification(), new double[] { 0 }, 0));
+                    data.add(new EdfSeries("Measurement sample data not found: " + sample.getSpecification(), new double[][] {{ 0 },{ 0 }}, 0));
                     ++failed;
                 }
             }
