@@ -32,6 +32,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.commons.math3.random.EmpiricalDistribution;
 
@@ -44,6 +46,10 @@ import org.jfree.chart.title.TextTitle;
 //import org.jfree.data.statistics.HistogramDataset;
 //import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.xy.XYDataset; 
+import org.jfree.data.xy.XYSeries; 
+import org.jfree.data.xy.XYSeriesCollection; 
+import org.jfree.chart.plot.XYPlot; 
 
 import cz.cuni.mff.spl.evaluator.input.MeasurementDataProvider.MeasurementDataNotFoundException;
 import cz.cuni.mff.spl.evaluator.statistics.DataClipper;
@@ -98,31 +104,39 @@ public class EdfCreator {
     public JFreeChart createEdfGraph(String plotTitle, String plotSubtitle, List<EdfSeries> data, String xaxisTitle, String yaxisTitle,
             boolean showLegend) {
 
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        //dataset.setType(HistogramType.FREQUENCY);
+        XYDataset dataset = this.createDataset(data);
 
-
-        for (EdfSeries oneData : data) {
-            
-            for (int i = 0; i < oneData.data.length; i++){
-                // x axis is i + min - 1, -1 is so you start at 0
-                dataset.addValue( (Number)(oneData.data[i][0] ) , oneData.title, oneData.data[i][1]);
-            }
-        }
         PlotOrientation orientation = PlotOrientation.VERTICAL;
         boolean toolTips = false;
         boolean urls = false;
-        final JFreeChart chart = ChartFactory.createLineChart(plotTitle, xaxisTitle,
+        final JFreeChart chart = ChartFactory.createXYLineChart(plotTitle, xaxisTitle,
                 yaxisTitle, dataset, orientation, showLegend, toolTips, urls);
 
         if (plotSubtitle != null && !plotSubtitle.isEmpty()) {
             chart.addSubtitle(new TextTitle(plotSubtitle));
         }
 
-        graphUtils.configureEdfChartWithDefaults(chart);
+        graphUtils.configureChartWithDefaults(chart);
 
         return chart;
     }
+
+
+     private XYDataset createDataset( List<EdfSeries> data){
+        final XYSeriesCollection dataset = new XYSeriesCollection( );  
+        for (EdfSeries oneData : data) {
+            XYSeries dataSeries = new XYSeries(oneData.title);
+            
+            for (int i = 0; i < oneData.data.size(); i++){
+                // x axis is i + min - 1, -1 is so you start at 0
+                dataSeries.add( oneData.data.get(i).get(1), oneData.data.get(i).get(0));
+            }
+            dataset.addSeries(dataSeries);
+        }
+
+        
+        return dataset;
+     }
 
     /**
      * The Class EdfSeries.
@@ -130,7 +144,7 @@ public class EdfCreator {
     public static class EdfSeries {
 
         /** The series data. */
-        public final double[][] data;
+        public final ArrayList<ArrayList<Double>> data;
 
         /** The series title. */
         public final String   title;
@@ -146,7 +160,7 @@ public class EdfCreator {
          * @param data
          *            The series data.
          */
-        public EdfSeries(String title, double[][] data, double min) {
+        public EdfSeries(String title, ArrayList<ArrayList<Double>> data, double min) {
             this.data = data;
             this.title = title;
             this.min = min;
@@ -193,11 +207,15 @@ public class EdfCreator {
                     dist.load(clippedData); 
                    */
                     EmpiricalDistributionNew dist = new EmpiricalDistributionNew(numBins);
-                    double[][] output = dist.load(clippedData);
+                    ArrayList<ArrayList<Double>> output = dist.load(clippedData);
                     data.add(new EdfSeries(sample.getSpecification(), output, min));
                     //binCount = range;
                 } catch (MeasurementDataNotFoundException e) {
-                    data.add(new EdfSeries("Measurement sample data not found: " + sample.getSpecification(), new double[][] {{ 0 },{ 0 }}, 0));
+                    ArrayList<Double> zero = new ArrayList<Double>(Arrays.asList(0D,0D));
+                    ArrayList<ArrayList<Double>> empty = new ArrayList<ArrayList<Double>>();
+                    empty.add(zero);
+
+                    data.add(new EdfSeries("Measurement sample data not found: " + sample.getSpecification(), empty, 0));
                     ++failed;
                 }
             }
