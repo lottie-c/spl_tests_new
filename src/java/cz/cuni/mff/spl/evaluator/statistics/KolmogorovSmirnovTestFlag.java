@@ -150,6 +150,8 @@ public class KolmogorovSmirnovTestFlag {
     /** Random data generator used by {@link #monteCarloP(double, int, int, boolean, int)} */
     private final RandomGenerator rng;
 
+    private static int negFlag = 0;
+
     /**
      * Construct a KolmogorovSmirnovTest instance with a default random data generator.
      */
@@ -167,6 +169,10 @@ public class KolmogorovSmirnovTestFlag {
     @Deprecated
     public KolmogorovSmirnovTestFlag(RandomGenerator rng) {
         this.rng = rng;
+    }
+
+    public int getNegFlag(){
+        return negFlag;
     }
 
     /**
@@ -273,7 +279,7 @@ public class KolmogorovSmirnovTestFlag {
         return approximateP(kolmogorovSmirnovStatistic(x, y), x.length, y.length);
     }
 
-    public double[] kolmogorovSmirnovTestFlag(double[] x, double[] y, boolean strict) {
+    public double kolmogorovSmirnovTestFlag(double[] x, double[] y, boolean strict) {
         final long lengthProduct = (long) x.length * y.length;
         double[] xa = null;
         double[] ya = null;
@@ -285,22 +291,10 @@ public class KolmogorovSmirnovTestFlag {
             xa = x;
             ya = y;
         }
-        
         if (lengthProduct < LARGE_SAMPLE_PRODUCT) {
-            double[] testOutput = kolmogorovSmirnovStatisticFlag(xa, ya);
-            double testStat = testOutput[0];
-   
-            double[] output = new double[2];
-            output[0] = exactP(testStat, x.length, y.length, strict);
-            output[1] = testOutput[1];
-            return output;
+            return exactP(kolmogorovSmirnovStatisticFlag(xa, ya), x.length, y.length, strict);
         }
-        double[] testOutput = kolmogorovSmirnovStatisticFlag(x, y);
-        double testStat = testOutput[0];
-        double[] output = new double[2];
-        output[0] = exactP(testStat, x.length, y.length, strict);
-        output[1] = testOutput[1];
-        return output;
+        return approximateP(kolmogorovSmirnovStatisticFlag(x, y), x.length, y.length);
     }
 
     /**
@@ -322,7 +316,7 @@ public class KolmogorovSmirnovTestFlag {
         return kolmogorovSmirnovTest(x, y, true);
     }
 
-    public double[] kolmogorovSmirnovTestFlag(double[] x, double[] y) {
+    public double kolmogorovSmirnovTestFlag(double[] x, double[] y) {
         return kolmogorovSmirnovTestFlag(x, y, true);
     }
 
@@ -344,13 +338,8 @@ public class KolmogorovSmirnovTestFlag {
         return integralKolmogorovSmirnovStatistic(x, y)/((double)(x.length * (long)y.length));
     }
 
-    public double[] kolmogorovSmirnovStatisticFlag(double[] x, double[] y) {
-        long[] results = integralKolmogorovSmirnovStatisticFlag(x, y);
-        double[] output = new double[2];
-        output[0] = output[0]/((double)(x.length * (long)y.length));
-        output[1] = (double)results[1];
-
-        return output;
+    public double kolmogorovSmirnovStatisticFlag(double[] x, double[] y) {
+        return integralKolmogorovSmirnovStatisticFlag(x, y)/((double)(x.length * (long)y.length));
     }
 
     /**
@@ -369,7 +358,25 @@ public class KolmogorovSmirnovTestFlag {
      * @throws NullArgumentException if either {@code x} or {@code y} is null
      */
     
-    private long[] integralKolmogorovSmirnovStatisticFlag(double[] x, double[] y) {
+    /**
+     * Computes the two-sample Kolmogorov-Smirnov test statistic, \(D_{n,m}=\sup_x |F_n(x)-F_m(x)|\)
+     * where \(n\) is the length of {@code x}, \(m\) is the length of {@code y}, \(F_n\) is the
+     * empirical distribution that puts mass \(1/n\) at each of the values in {@code x} and \(F_m\)
+     * is the empirical distribution of the {@code y} values. Finally \(n m D_{n,m}\) is returned
+     * as long value. 
+     *
+     * Implementation added to indicate whether the supremum was gained from a positive or negative 
+     * (negFlag =  0 or 1 respectively) difference
+     *
+     * @param x first sample
+     * @param y second sample
+     * @return test statistic \(n m D_{n,m}\) used to evaluate the null hypothesis that {@code x} and
+     *         {@code y} represent samples from the same underlying distribution
+     * @throws InsufficientDataException if either {@code x} or {@code y} does not have length at
+     *         least 2
+     * @throws NullArgumentException if either {@code x} or {@code y} is null
+     */
+    private long integralKolmogorovSmirnovStatisticFlag(double[] x, double[] y) {
         checkArray(x);
         checkArray(y);
         // Copy and sort the sample arrays
@@ -377,8 +384,6 @@ public class KolmogorovSmirnovTestFlag {
         final double[] sy = MathArrays.copyOf(y);
         Arrays.sort(sx);
         Arrays.sort(sy);
-
-        long negFlag = 0l;
 
         final int n = sx.length;
         final int m = sy.length;
@@ -400,19 +405,18 @@ public class KolmogorovSmirnovTestFlag {
                 curD -= n;
             }
             if (curD > supD) {
-                negFlag = 0l;
+                negFlag = 0;
                 supD = curD;
             }
             //the current largest difference is -ve and hence y lies left of x
             else if (-curD > supD) {
-                negFlag = 1l;
+                negFlag = 1;
                 supD = -curD;
             }
         } while(rankX < n && rankY < m);
-        long[] output = new long[2];
-        output[0] = supD;
-        output[1] = negFlag;
-        return output;
+        System.out.println("KolmogorovSmirnovTestFlag.integralKolmogorovSmirnovStatisticFlag(): supD = " 
+            + supD + "negFlag = " + negFlag);
+        return supD;
     }
 
     private long integralKolmogorovSmirnovStatistic(double[] x, double[] y) {
