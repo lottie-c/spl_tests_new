@@ -109,6 +109,7 @@
 					<h2>Comparison statistical data</h2>
 
 					<h3> T Test</h3>
+					<p> The T-Test compares the means of the sample distributions. This test is reliable when the data is approximately normal or sample size is very high (due to the Central Limit Theorem), it is however prone to false positives when this is not true.</p>
 					<table class="comparison-statistical-data statistical-data">
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
@@ -138,6 +139,7 @@
 					</table>
 
 					<h3>Mann Whitney Wilcoxon Test</h3>
+					<p> The Mann Whitney Wilcoxon test compares the medians of the two sample distributions. This test should be more accurate when dealing with non-normal distributions, especially when sample size is low.</p>
 					<table class="comparison-statistical-data statistical-data">	
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
@@ -166,6 +168,7 @@
 						</xsl:call-template>
 					</table>
 					<h3>Kolmogorov Smirnov Test</h3>
+					<p> The Kolmogorov Smirnov Test, tests whether two distributions are equal, it is useful for testing whether the performance of one test is better than another over the whole distribution, see the EDF graph below.</p>
 					<table class="comparison-statistical-data statistical-data">
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
