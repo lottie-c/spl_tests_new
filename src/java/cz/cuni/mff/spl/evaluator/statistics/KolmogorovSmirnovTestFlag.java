@@ -414,8 +414,6 @@ public class KolmogorovSmirnovTestFlag {
                 supD = -curD;
             }
         } while(rankX < n && rankY < m);
-        System.out.println("KolmogorovSmirnovTestFlag.integralKolmogorovSmirnovStatisticFlag(): supD = " 
-            + supD + "negFlag = " + negFlag);
         return supD;
     }
 

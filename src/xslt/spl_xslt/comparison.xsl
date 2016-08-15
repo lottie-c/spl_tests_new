@@ -108,15 +108,16 @@
 
 					<h2>Comparison statistical data</h2>
 
+					<h3> T Test</h3>
 					<table class="comparison-statistical-data statistical-data">
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
-								select="' T-test Comparison evalution result '" />
+								select="' Comparison evalution result '" />
 							<xsl:with-param name="VALUE" select="$statisticalResult" />
 							<xsl:with-param name="VALID" select="$isSatisfied" />
 						</xsl:call-template>
 						<xsl:call-template name="PRINTER.tableRow">
-							<xsl:with-param name="KEY" select="'T-test p-value'" />
+							<xsl:with-param name="KEY" select="'p-value'" />
 							<xsl:with-param name="VALUE">
 								<xsl:call-template name="PRINTER.format.pvalue">
 									<xsl:with-param name="VALUE"
@@ -126,7 +127,7 @@
 							<xsl:with-param name="VALID" select="$isSatisfied" />
 						</xsl:call-template>
 						<xsl:call-template name="PRINTER.tableRow">
-							<xsl:with-param name="KEY" select="'T-test limit p-value'" />
+							<xsl:with-param name="KEY" select="'limit p-value'" />
 							<xsl:with-param name="VALUE">
 								<xsl:call-template name="PRINTER.format.pvalue">
 									<xsl:with-param name="VALUE"
@@ -134,16 +135,18 @@
 								</xsl:call-template>
 							</xsl:with-param>
 						</xsl:call-template>
+					</table>
 
-
+					<h3>Mann Whitney Wilcoxon Test</h3>
+					<table class="comparison-statistical-data statistical-data">	
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
-								select="'Mann Whitney Wilcoxon test Comparison evalution result'" />
+								select="'Comparison evalution result'" />
 							<xsl:with-param name="VALUE" select="$statisticalResultMWW" />
 							<xsl:with-param name="VALID" select="$isSatisfiedMWW" />
 						</xsl:call-template>
 						<xsl:call-template name="PRINTER.tableRow">
-							<xsl:with-param name="KEY" select="'Mann Whitney Wilcoxon test p-value'" />
+							<xsl:with-param name="KEY" select="'p-value'" />
 							<xsl:with-param name="VALUE">
 								<xsl:call-template name="PRINTER.format.pvalue">
 									<xsl:with-param name="VALUE"
@@ -153,7 +156,7 @@
 							<xsl:with-param name="VALID" select="$isSatisfiedMWW" />
 						</xsl:call-template>
 						<xsl:call-template name="PRINTER.tableRow">
-							<xsl:with-param name="KEY" select="'Mann Whitney Wilcoxon limit p-value'" />
+							<xsl:with-param name="KEY" select="'limit p-value'" />
 							<xsl:with-param name="VALUE">
 								<xsl:call-template name="PRINTER.format.pvalue">
 									<xsl:with-param name="VALUE"
@@ -161,15 +164,17 @@
 								</xsl:call-template>
 							</xsl:with-param>
 						</xsl:call-template>
-
+					</table>
+					<h3>Kolmogorov Smirnov Test</h3>
+					<table class="comparison-statistical-data statistical-data">
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
-								select="'KS test Comparison evalution result'" />
+								select="'Comparison evalution result'" />
 							<xsl:with-param name="VALUE" select="$statisticalResultKS" />
 							<xsl:with-param name="VALID" select="$isSatisfiedKS" />
 						</xsl:call-template>
 						<xsl:call-template name="PRINTER.tableRow">
-							<xsl:with-param name="KEY" select="'KS test p-value'" />
+							<xsl:with-param name="KEY" select="'p-value'" />
 							<xsl:with-param name="VALUE">
 								<xsl:call-template name="PRINTER.format.pvalue">
 									<xsl:with-param name="VALUE"
@@ -179,7 +184,7 @@
 							<xsl:with-param name="VALID" select="$isSatisfiedKS" />
 						</xsl:call-template>
 						<xsl:call-template name="PRINTER.tableRow">
-							<xsl:with-param name="KEY" select="'KS limit p-value'" />
+							<xsl:with-param name="KEY" select="'p-value'" />
 							<xsl:with-param name="VALUE">
 								<xsl:call-template name="PRINTER.format.pvalue">
 									<xsl:with-param name="VALUE"

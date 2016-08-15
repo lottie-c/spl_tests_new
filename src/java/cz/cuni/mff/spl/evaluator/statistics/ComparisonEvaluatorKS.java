@@ -252,8 +252,9 @@ public class ComparisonEvaluatorKS {
      * @see ComparisonResult
      * @see MannWhitneyUTest#MannWhitneyUTest(double[], double[])
      */
-   /* private ComparisonResult processComparison(Comparison comparison, double[] dataArray1,
-     double[] dataArray2, Sign comparisonType) {
+
+    private ComparisonResult processComparison(Comparison comparison, double[] dataArray1,
+        double[] dataArray2, Sign comparisonType) {
 
         if (dataArray1.length < 2 || dataArray2.length < 2) {
             return ComparisonResult.createNotComputedComparisonResult("Not enough measurement samples for statistical Mann Whitney Wilcoxon test.");
@@ -261,7 +262,6 @@ public class ComparisonEvaluatorKS {
 
         switch (comparisonType) {
             case EQI:
-                System.out.println("ComparisonEvaluatorKS: processComparison EQI: ");
                 // this is the most complex case as we need to evaluate equality
                 // with interval check
                 return processIntervalEqualityComparison(comparison,
@@ -269,16 +269,13 @@ public class ComparisonEvaluatorKS {
 
             case GE:
                 // just swap values and test for LE
-                System.out.println("ComparisonEvaluatorKS: processComparison GE: ");
                 return processComparison(comparison,
                  dataArray2, dataArray1, Sign.LE);
             case GT:
                 // just swap values and test for LT
-                System.out.println("ComparisonEvaluatorKS: processComparison GT: ");
                 return processComparison(comparison, 
                     dataArray2, dataArray1, Sign.LT);
             case LE: {
-                System.out.println("ComparisonEvaluatorKS: processComparison LE: ");
                 ComparisonResult lt = processComparison(comparison, 
                     dataArray1, dataArray2, Sign.LT);
                 ComparisonResult eq = processComparison(comparison,
@@ -286,94 +283,8 @@ public class ComparisonEvaluatorKS {
                 if (lt.isSatisfied() && eq.isSatisfied()) {
                     return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
                 } else if (lt.isSatisfied()) {
-                    System.out.println("lt is satisfied, returning lt, p_value = " + lt.getPValue());
                     return lt;
                 } else {
-                    System.out.print("eq is");
-                    if(!eq.isSatisfied()){
-                         System.out.print(" not ");
-                    }
-                    System.out.println("satisfied, returning lt, p_value = " + eq.getPValue());
-                    return eq;
-                }
-            }
-            case LT:
-                
-                // need to divide answer by 2 for a one sided test
-                // first need to check that the test statistic is not in upper tail
-                //kolmogorovSmirnovTestFlag returns double[2], first element is pValue
-                // when second elemnet  = 0 the difference calculated in the KS test is 
-                // positive, else it is negative
-                double[] testOutput = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2);
-                double testPValue = testOutput[0];
-                double negFlag = testOutput[1];
-                System.out.println(KSTEST.kolmogorovSmirnovTest(dataArray1, dataArray2));
-                 System.out.println("ComparisonEvaluatorKS: processComparison LT:");
-                if (negFlag == 0) {
-                    double pValueNegate = testPValue / 2.0;
-                    // KS test validation says, that both series means are equal
-                    // but we don't want this result, we want negation
-                    boolean result = !confidenceChecker.isPvalueAcceptable(pValueNegate);
-                    System.out.println("In negFlag ==0,  p_value = " + pValueNegate + " isSatisfied = " + result);
-                    return new ComparisonResult(pValueNegate, result);
-                } else {
-                    // the largest difference between the distributions is negative
-                    // hence dataArray2 likely lies to the left of dataArray1
-                     System.out.println("In negFlag == 1,  p_value = " + 0 + " isSatisfied = " + false);
-                    return new ComparisonResult(0, false);
-                }
-            case EQ:
-                double pValue = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2)[0];
-                boolean acceptable = confidenceChecker.isPvalueAcceptable(pValue);
-                System.out.println("ComparisonEvaluatorKS: processComparison EQ: pvalue = " + pValue + " isSatisfied = " + acceptable);
-                return new ComparisonResult(pValue, acceptable);
-            default:
-                throw new IllegalStateException("Unexpected switch value " + comparisonType.toString());
-        }
-    }*/
-
-private ComparisonResult processComparison(Comparison comparison, double[] dataArray1,
-     double[] dataArray2, Sign comparisonType) {
-
-        if (dataArray1.length < 2 || dataArray2.length < 2) {
-            return ComparisonResult.createNotComputedComparisonResult("Not enough measurement samples for statistical Mann Whitney Wilcoxon test.");
-        }
-
-        switch (comparisonType) {
-            case EQI:
-                System.out.println("ComparisonEvaluatorKS: processComparison EQI: ");
-                // this is the most complex case as we need to evaluate equality
-                // with interval check
-                return processIntervalEqualityComparison(comparison,
-                    dataArray2, dataArray1);
-
-            case GE:
-                // just swap values and test for LE
-                System.out.println("ComparisonEvaluatorKS: processComparison GE: ");
-                return processComparison(comparison,
-                 dataArray2, dataArray1, Sign.LE);
-            case GT:
-                // just swap values and test for LT
-                System.out.println("ComparisonEvaluatorKS: processComparison GT: ");
-                return processComparison(comparison, 
-                    dataArray2, dataArray1, Sign.LT);
-            case LE: {
-                System.out.println("ComparisonEvaluatorKS: processComparison LE: ");
-                ComparisonResult lt = processComparison(comparison, 
-                    dataArray1, dataArray2, Sign.LT);
-                ComparisonResult eq = processComparison(comparison,
-                    dataArray1, dataArray2, Sign.EQ);
-                if (lt.isSatisfied() && eq.isSatisfied()) {
-                    return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
-                } else if (lt.isSatisfied()) {
-                    System.out.println("lt is satisfied, returning lt, p_value = " + lt.getPValue());
-                    return lt;
-                } else {
-                    System.out.print("eq is");
-                    if(!eq.isSatisfied()){
-                         System.out.print(" not ");
-                    }
-                    System.out.println("satisfied, returning lt, p_value = " + eq.getPValue());
                     return eq;
                 }
             }
@@ -390,7 +301,6 @@ private ComparisonResult processComparison(Comparison comparison, double[] dataA
                     // KS test validation says, that both series means are equal
                     // but we don't want this result, we want negation
                     boolean result = !confidenceChecker.isPvalueAcceptable(pValueNegate);
-                    System.out.println("In negFlag ==0,  p_value = " + pValueNegate + " isSatisfied = " + result);
                     return new ComparisonResult(pValueNegate, result);
                 }else{
                     return new ComparisonResult(0, false);
@@ -399,7 +309,6 @@ private ComparisonResult processComparison(Comparison comparison, double[] dataA
             case EQ:
                 double pValue = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2);
                 boolean acceptable = confidenceChecker.isPvalueAcceptable(pValue);
-                System.out.println("ComparisonEvaluatorKS: processComparison EQ: pvalue = " + pValue + " isSatisfied = " + acceptable);
                 return new ComparisonResult(pValue, acceptable);
             default:
                 throw new IllegalStateException("Unexpected switch value " + comparisonType.toString());
