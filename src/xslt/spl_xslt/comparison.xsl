@@ -187,7 +187,7 @@
 							<xsl:with-param name="VALID" select="$isSatisfiedKS" />
 						</xsl:call-template>
 						<xsl:call-template name="PRINTER.tableRow">
-							<xsl:with-param name="KEY" select="'p-value'" />
+							<xsl:with-param name="KEY" select="'limit p-value'" />
 							<xsl:with-param name="VALUE">
 								<xsl:call-template name="PRINTER.format.pvalue">
 									<xsl:with-param name="VALUE"
