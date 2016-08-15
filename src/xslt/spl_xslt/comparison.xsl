@@ -113,7 +113,7 @@
 					<table class="comparison-statistical-data statistical-data">
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
-								select="' Comparison evalution result '" />
+								select="' Comparison evaluation result '" />
 							<xsl:with-param name="VALUE" select="$statisticalResult" />
 							<xsl:with-param name="VALID" select="$isSatisfied" />
 						</xsl:call-template>
@@ -143,7 +143,7 @@
 					<table class="comparison-statistical-data statistical-data">	
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
-								select="'Comparison evalution result'" />
+								select="'Comparison evaluation result'" />
 							<xsl:with-param name="VALUE" select="$statisticalResultMWW" />
 							<xsl:with-param name="VALID" select="$isSatisfiedMWW" />
 						</xsl:call-template>
@@ -172,7 +172,7 @@
 					<table class="comparison-statistical-data statistical-data">
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
-								select="'Comparison evalution result'" />
+								select="'Comparison evaluation result'" />
 							<xsl:with-param name="VALUE" select="$statisticalResultKS" />
 							<xsl:with-param name="VALID" select="$isSatisfiedKS" />
 						</xsl:call-template>

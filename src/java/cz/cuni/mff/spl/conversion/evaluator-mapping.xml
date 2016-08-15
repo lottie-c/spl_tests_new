@@ -68,13 +68,12 @@
         </field>  
         
         <field name="comparisonResultMWW" type="cz.cuni.mff.spl.evaluator.output.results.ComparisonResult">
-                <bind-xml name="comparison-result-MWW" node="element"/>
-            </field>     
-         <!--  
-            <field name="comparisonResultKS" type="cz.cuni.mff.spl.evaluator.output.results.ComparisonResult">
-                <bind-xml auto-naming="deriveByClass" node="element"/>
-            </field>
-        -->        
+            <bind-xml name="comparison-result-MWW" node="element"/>
+        </field>     
+        
+        <field name="comparisonResultKS" type="cz.cuni.mff.spl.evaluator.output.results.ComparisonResult">
+             <bind-xml name="comparison-result-KS" node="element"/>
+        </field>       
     </class>
 
  	<class name="cz.cuni.mff.spl.evaluator.statistics.MeasurementSample" identity="id">
