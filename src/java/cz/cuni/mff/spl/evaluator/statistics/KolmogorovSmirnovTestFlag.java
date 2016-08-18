@@ -150,7 +150,7 @@ public class KolmogorovSmirnovTestFlag {
     /** Random data generator used by {@link #monteCarloP(double, int, int, boolean, int)} */
     private final RandomGenerator rng;
 
-    private static int negFlag = 0;
+    private int negFlag = 0;
 
     /**
      * Construct a KolmogorovSmirnovTest instance with a default random data generator.
@@ -391,7 +391,7 @@ public class KolmogorovSmirnovTestFlag {
         int rankX = 0;
         int rankY = 0;
         long curD = 0l;
-
+        negFlag = 0;
         // Find the max difference between cdf_x and cdf_y
         long supD = 0l;
         do {
