@@ -67,7 +67,7 @@
 		</xsl:call-template>
 
 		<xsl:variable name="statisticalResult"
-			select="$comparisonResult/comparison-result/@result" />
+			select="$comparisonResult/comparison-result-T/@result" />
 		<xsl:variable name="statisticalResultMWW"
 			select="$comparisonResult/comparison-result-MWW/@result" />
 		<xsl:variable name="statisticalResultKS"

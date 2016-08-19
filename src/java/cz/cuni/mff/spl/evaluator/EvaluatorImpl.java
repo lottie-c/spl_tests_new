@@ -47,6 +47,7 @@ import cz.cuni.mff.spl.evaluator.output.results.EvaluationResult;
 import cz.cuni.mff.spl.evaluator.output.results.FormulaEvaluationResult;
 import cz.cuni.mff.spl.evaluator.output.results.LogicalOperationEvaluationResult;
 import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluator;
+import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorT;
 import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorMWW;
 import cz.cuni.mff.spl.evaluator.statistics.ComparisonEvaluatorKS;
 import cz.cuni.mff.spl.evaluator.statistics.MeasurementSample;

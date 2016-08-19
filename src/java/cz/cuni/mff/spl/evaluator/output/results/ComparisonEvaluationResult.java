@@ -42,7 +42,7 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
     private Comparison              comparison;
 
     /** The comparison result performing a t test. */
-    private ComparisonResult        comparisonResult;
+    private ComparisonResult        comparisonResultT;
 
     /** The comparison result performing a Mann Whitney U test. */
     private ComparisonResult    comparisonResultMWW;
@@ -70,11 +70,11 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
      *            The right measurement sample.
      */
     
-    public ComparisonEvaluationResult(Comparison comparison, ComparisonResult comparisonResult, 
+    public ComparisonEvaluationResult(Comparison comparison, ComparisonResult comparisonResultT, 
         ComparisonResult comparisonResultMWW, ComparisonResult comparisonResultKS, MeasurementSample leftMeasurementSample,
         MeasurementSample rightMeasurementSample) {
         this.comparison = comparison;
-        this.comparisonResult = comparisonResult;
+        this.comparisonResultT = comparisonResultT;
         this.comparisonResultMWW = comparisonResultMWW;
         this.comparisonResultKS = comparisonResultKS;
         this.leftMeasurementSample = leftMeasurementSample;
@@ -96,8 +96,8 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
         return EvaluationResultType.COMPARISON;
     }
 
-    public ComparisonResult getComparisonResult() {
-        return this.comparisonResult;
+    public ComparisonResult getComparisonResultT() {
+        return this.comparisonResultT;
     }
 
     public ComparisonResult getComparisonResultMWW() {
@@ -152,7 +152,7 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
 
             return otherResult.isComparisonEvaluationResult()
                     && otherResult.getComparison().equals(comparison)
-                    && otherResult.getComparisonResult().equals(comparisonResult)
+                    && otherResult.getComparisonResultT().equals(comparisonResultT)
                     /*&& otherResult.getComparisonResultMWW().equals(comparisonResultMWW)
                     && otherResult.getComparisonResultKS().equals(comparisonResultKS)*/
                     && otherResult.getLeftMeasurementSample().equals(leftMeasurementSample)
@@ -193,8 +193,8 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
      *            The new comparison result.
      */
     @Deprecated
-    public void setComparisonResult(ComparisonResult comparisonResult) {
-        this.comparisonResult = comparisonResult;
+    public void setComparisonResultT(ComparisonResult comparisonResultT) {
+        this.comparisonResultT = comparisonResultT;
     }
 
     /**
