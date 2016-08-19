@@ -61,48 +61,7 @@ public class KSFlagTest{
 	/*want to test
 		same dist gives  p-value 1
 		KSFlag gives same p_value as ks test*/
-	/*
-	public static void init(){
-		
-		try{
-			Scanner src1 = new Scanner(new File("/junit-data/N(0,1).txt"));
-			Scanner src2 = new Scanner(new File("/junit-data/N(3,1).txt"));
-
-			List<Double> sample1 = new ArrayList<Double>();
-			List<Double> sample2 = new ArrayList<Double>();
-			while(src1.hasNextDouble()){
-				sample1.add(src1.nextDouble());
-			}
-			src1.close();
-			while(src2.hasNextDouble()){
-				sample2.add(src2.nextDouble());
-			}
-			src2.close();
-
-			x = new double[sample1.size()];
-			for(int i = 0; i < sample1.size(); i++){
-				x[i] = sample1.get(i).doubleValue();
-			}
-
-			y = new double[sample2.size()];
-			for(int i = 0; i < sample2.size(); i++){
-				y[i] = sample2.get(i).doubleValue();
-			}
-		}catch(Exception e){
-			System.err.print("Error:" + e );
-		}
-
-		
-		
-		
-
-	}*/
-/*
-	public static void main(String[] args){
-		init_different();
-		System.out.println(x[1] + " " + y[1]);
-	}
-*/
+	
 	@Test
 	public void testKSFlag(){	
 		KolmogorovSmirnovTestFlag TEST_WITH_FLAG = new KolmogorovSmirnovTestFlag();
