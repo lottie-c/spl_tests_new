@@ -35,16 +35,10 @@ import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.commons.math3.random.EmpiricalDistribution;
-
-
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.title.TextTitle;
-//import org.jfree.data.statistics.HistogramDataset;
-//import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.XYDataset; 
 import org.jfree.data.xy.XYSeries; 
@@ -57,7 +51,7 @@ import cz.cuni.mff.spl.evaluator.statistics.MeasurementSample;
 import cz.cuni.mff.spl.evaluator.statistics.SimpleStatisticalFunctions;
 
 /**
- * The implementation for Emperical Distristribution graph creation.
+ * The implementation for Empirical Distristribution graph creation.
  * 
  * @author Lottie Carruthers
  */
@@ -203,13 +197,9 @@ public class EdfCreator {
                         }
                     }
                     int numBins = clippedData.length/10;
-                    /*EmpiricalDistribution dist = new EmpiricalDistribution(numBins);
-                    dist.load(clippedData); 
-                   */
-                    EmpiricalDistributionNew dist = new EmpiricalDistributionNew(numBins);
+                    EmpiricalDistribution dist = new EmpiricalDistribution(numBins);
                     ArrayList<ArrayList<Double>> output = dist.load(clippedData);
                     data.add(new EdfSeries(sample.getSpecification(), output, min));
-                    //binCount = range;
                 } catch (MeasurementDataNotFoundException e) {
                     ArrayList<Double> zero = new ArrayList<Double>(Arrays.asList(0D,0D));
                     ArrayList<ArrayList<Double>> empty = new ArrayList<ArrayList<Double>>();

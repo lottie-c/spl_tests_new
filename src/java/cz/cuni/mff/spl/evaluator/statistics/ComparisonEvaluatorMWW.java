@@ -27,8 +27,6 @@
  */
 package cz.cuni.mff.spl.evaluator.statistics;
 
-import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
-import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues;
 import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
 
 import cz.cuni.mff.spl.annotation.Comparison;
@@ -118,11 +116,6 @@ public class ComparisonEvaluatorMWW {
                     leftMeasurement, rightMeasurement, comparison.getSign());
             } else {
                 String errorMessage;
-
-				/*StatisticalSummary leftSummary = transformStatisticalSummary(leftMeasurementSample.getStatisticalSummary(),
-                        getLambdaMultiplier(comparison.getLeftLambda()));
-                StatisticalSummary rightSummary = transformStatisticalSummary(rightMeasurementSample.getStatisticalSummary(),
-                        getLambdaMultiplier(comparison.getRightLambda()));*/
                 MeasurementState leftMeasurementState = leftMeasurementSample.getMeasurement().getMeasurementState();
                 MeasurementState rightMeasurementState = rightMeasurementSample.getMeasurement().getMeasurementState();
 
@@ -196,41 +189,6 @@ public class ComparisonEvaluatorMWW {
 
             return ComparisonResult.createNotComputedComparisonResult(errorMessage);
         }
-    }
-
-    /**
-     * Transforms the statistical summary with provided lambda multiplier.
-     * Returned statistical summary represents original measurement sample data
-     * multiplied by lambda multiplier.
-     * 
-     * In fact only statistical adjustment with lambda multiplier is done in
-     * 
-     * @param statisticalSummary
-     *            The statistical summary to transform.
-     * @param lambdaMultiplier
-     *            The lambda multiplier.
-     * @return The transformed statistical summary.
-     *         {@link StatisticalSummaryValues#StatisticalSummaryValues(double, double, long, double, double, double)}
-     *         :
-     *         <ul>
-     *         <li>Sample count is unchanged.</li>
-     *         <li>Mean, maximum, minimum and sum are multiplied with lambda
-     *         multiplier.</li>
-     *         <li>Variance is multiplied with lambda multiplier twice as
-     *         standard deviation is square root of variance and it would need
-     *         only one multiplication with lambda multiplier.</li>
-     *         </ul>
-     * 
-     *         Note than slight difference in counted values will be always
-     *         present due
-     *         to double arithmetics as statistical values are not computed from
-     *         multiplied data directly.
-     */
-    public static StatisticalSummary transformStatisticalSummary(StatisticalSummary statisticalSummary, double lambdaMultiplier) {
-        return new StatisticalSummaryValues(lambdaMultiplier * statisticalSummary.getMean(), lambdaMultiplier * lambdaMultiplier
-                * statisticalSummary.getVariance(),
-                statisticalSummary.getN(),
-                lambdaMultiplier * statisticalSummary.getMax(), lambdaMultiplier * statisticalSummary.getMin(), lambdaMultiplier * statisticalSummary.getSum());
     }
 
     /**
