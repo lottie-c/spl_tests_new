@@ -110,8 +110,6 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
                 ComparisonResult eq = processComparison(comparison, dataArray1, dataArray2,
                      measuredData1, measuredData2, median1, median2, Sign.EQ);
 
-                    System.out.println("ComparisonEvaluatorT.processComparison: \n lt.pvalue = "
-                        + lt.getPValue() + "\n eq.pValue = " + eq.getPValue());
                 if (lt.isSatisfied() && eq.isSatisfied()) {
                     return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
                 } else if (lt.isSatisfied()) {
