@@ -105,10 +105,13 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
                 return processComparison(comparison, dataArray2, dataArray1,
                      measuredData2, measuredData1, median2, median1, Sign.LT);
             case LE: {
-                ComparisonResult lt = processComparison(comparison, dataArray2, dataArray1,
-                     measuredData2, measuredData1, median2, median1, Sign.LT);
-                ComparisonResult eq = processComparison(comparison, dataArray2, dataArray1,
-                     measuredData2, measuredData1, median2, median1, Sign.EQ);
+                ComparisonResult lt = processComparison(comparison, dataArray1, dataArray2,
+                     measuredData1, measuredData2, median1, median2, Sign.LT);
+                ComparisonResult eq = processComparison(comparison, dataArray1, dataArray2,
+                     measuredData1, measuredData2, median1, median2, Sign.EQ);
+
+                    System.out.println("ComparisonEvaluatorT.processComparison: \n lt.pvalue = "
+                        + lt.getPValue() + "\n eq.pValue = " + eq.getPValue());
                 if (lt.isSatisfied() && eq.isSatisfied()) {
                     return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
                 } else if (lt.isSatisfied()) {

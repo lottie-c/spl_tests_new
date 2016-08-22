@@ -222,6 +222,7 @@ class EvaluatorImpl {
         outputProvider.generateMeasurementOutput(rightSample);
 
         ComparisonResult comparisonResultT = comparisonEvaluatorT.evaluate(formula, leftSample, rightSample);
+        System.out.println("EvaluatorImpl.evaluateComparison \n comparisonResultT.pvalue = " + comparisonResultT.getPValue());
         ComparisonResult comparisonResultMWW = comparisonEvaluatorMWW.evaluate(formula, leftSample, rightSample);
         ComparisonResult comparisonResultKS = comparisonEvaluatorKS.evaluate(formula, leftSample, rightSample);
         result = new ComparisonEvaluationResult(formula, comparisonResultT, comparisonResultMWW , comparisonResultKS, 
