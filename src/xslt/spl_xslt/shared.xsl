@@ -139,7 +139,7 @@
 			</xsl:call-template>
 
 			<xsl:variable name="comparisons"
-				select="$FORMULA//flat-comparison-evaluation-result/comparison-evaluation-result/comparison-result" />
+				select="$FORMULA//flat-comparison-evaluation-result/comparison-evaluation-result/comparison-result-T" />
 			<xsl:call-template name="PRINTER.tableRow">
 				<xsl:with-param name="KEY" select="'Comparisons'" />
 				<xsl:with-param name="VALUE"
