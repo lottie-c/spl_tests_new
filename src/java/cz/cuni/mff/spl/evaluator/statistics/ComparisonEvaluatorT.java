@@ -29,6 +29,8 @@ package cz.cuni.mff.spl.evaluator.statistics;
 
 
 import org.apache.commons.math3.stat.inference.TTest;
+import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
+import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues;
 
 import cz.cuni.mff.spl.annotation.Comparison;
 import cz.cuni.mff.spl.annotation.Lambda;
@@ -58,7 +60,7 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
      * @param checker
      */
     public ComparisonEvaluatorT(SplEvaluatorConfiguration configuration, StatisticValueChecker checker) {
-	super(configuraton, checker);
+	super(configuration, checker);
     }
 
     /**
@@ -79,8 +81,9 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
      * @see TTest#tTest(StatisticalSummary, StatisticalSummary)
      * @see TTest#tTest(StatisticalSummary, StatisticalSummary, double)
      */
-    private ComparisonResult processComparison(Comparison comparison, StatisticalSummary measuredData1, StatisticalSummary measuredData2,
-            Sign comparisonType) {
+    public ComparisonResult processComparison(Comparison comparison, 
+             double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
+             StatisticalSummary measuredData2, double median1, double median2, Sign comparisonType) {
 
         if (measuredData1.getN() < 2 || measuredData2.getN() < 2) {
             return ComparisonResult.createNotComputedComparisonResult("Not enough measurement samples for statistical t-test.");
@@ -90,17 +93,22 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
             case EQI:
                 // this is the most complex case as we need to evaluate equality
                 // with interval check
-                return processIntervalEqualityComparison(comparison, measuredData2, measuredData1);
+                return processIntervalEqualityComparison(comparison, dataArray2, dataArray1,
+                     measuredData2, measuredData1, median2, median1);
 
             case GE:
                 // just swap values and test for LE
-                return processComparison(comparison, measuredData2, measuredData1, Sign.LE);
+                return processComparison(comparison, dataArray2, dataArray1,
+                     measuredData2, measuredData1, median2, median1, Sign.LE);
             case GT:
                 // just swap values and test for LT
-                return processComparison(comparison, measuredData2, measuredData1, Sign.LT);
+                return processComparison(comparison, dataArray2, dataArray1,
+                     measuredData2, measuredData1, median2, median1, Sign.LT);
             case LE: {
-                ComparisonResult lt = processComparison(comparison, measuredData1, measuredData2, Sign.LT);
-                ComparisonResult eq = processComparison(comparison, measuredData1, measuredData2, Sign.EQ);
+                ComparisonResult lt = processComparison(comparison, dataArray2, dataArray1,
+                     measuredData2, measuredData1, median2, median1, Sign.LT);
+                ComparisonResult eq = processComparison(comparison, dataArray2, dataArray1,
+                     measuredData2, measuredData1, median2, median1, Sign.EQ);
                 if (lt.isSatisfied() && eq.isSatisfied()) {
                     return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
                 } else if (lt.isSatisfied()) {
@@ -153,7 +161,9 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
      *            The confidence checker.
      * @return The comparison result.
      */
-    private ComparisonResult processIntervalEqualityComparison(Comparison comparison, StatisticalSummary measuredData2, StatisticalSummary measuredData1) {
+    public ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
+             double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
+             StatisticalSummary measuredData2, double median1, double median2) {
 
         Double interval = comparison.getInterval();
         interval = interval != null ? interval : configuration.getEqualityInterval();
@@ -164,8 +174,10 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
         StatisticalSummary leftGreaterSummary = transformStatisticalSummary(measuredData1, 1.0d + interval);
         StatisticalSummary rightGreaterSummary = transformStatisticalSummary(measuredData2, 1.0d - interval);
 
-        ComparisonResult lowerResult = processComparison(comparison, leftLowerSummary, rightLowerSummary, Sign.LE);
-        ComparisonResult greaterResult = processComparison(comparison, leftGreaterSummary, rightGreaterSummary, Sign.GE);
+        ComparisonResult lowerResult = processComparison(comparison, dataArray1, dataArray2,
+            leftLowerSummary, rightLowerSummary, median1, median2, Sign.LE);
+        ComparisonResult greaterResult = processComparison(comparison, dataArray1, dataArray2,
+            leftGreaterSummary, rightGreaterSummary, median1, median2, Sign.GE);
 
         // combine results if satisfied, or return the one that failed
         if (lowerResult.isSatisfied() && greaterResult.isSatisfied()) {

@@ -63,7 +63,7 @@
         <field name="rightMeasurementSample" type="cz.cuni.mff.spl.evaluator.statistics.MeasurementSample">
         	<bind-xml name="right-measurement-sample-ref" node="attribute" type="IDREF" reference="true"/>
         </field>
-        <field name="comparisonResultT" type="cz.cuni.mff.spl.evaluator.output.results.ComparisonResultT">
+        <field name="comparisonResultT" type="cz.cuni.mff.spl.evaluator.output.results.ComparisonResult">
         	<bind-xml name="comparison-result-T" node="element"/>
         </field>  
         

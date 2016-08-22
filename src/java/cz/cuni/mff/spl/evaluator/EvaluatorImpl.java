@@ -65,7 +65,7 @@ class EvaluatorImpl {
     private final MeasurementSampleProvider     measurementSampleProvider;
 
     /** The comparison evaluator for the t test. */
-    private final ComparisonEvaluator           comparisonEvaluator;
+    private final ComparisonEvaluatorT           comparisonEvaluatorT;
 
     /** The comparison evaluator for the mann whitney u test*/
     private final ComparisonEvaluatorMWW        comparisonEvaluatorMWW;
@@ -88,7 +88,7 @@ class EvaluatorImpl {
      */
     EvaluatorImpl(MeasurementSampleProvider measurementSampleProvider, StatisticValueChecker checker, SplEvaluatorConfiguration configuration) {
         this.measurementSampleProvider = measurementSampleProvider;
-        this.comparisonEvaluator = new ComparisonEvaluator(configuration, checker);
+        this.comparisonEvaluatorT = new ComparisonEvaluatorT(configuration, checker);
         this.comparisonEvaluatorMWW = new ComparisonEvaluatorMWW(configuration, checker);
         this.comparisonEvaluatorKS = new ComparisonEvaluatorKS(configuration, checker);
     }
@@ -221,10 +221,10 @@ class EvaluatorImpl {
         outputProvider.generateMeasurementOutput(leftSample);
         outputProvider.generateMeasurementOutput(rightSample);
 
-        ComparisonResult comparisonResult = comparisonEvaluator.evaluate(formula, leftSample, rightSample);
+        ComparisonResult comparisonResultT = comparisonEvaluatorT.evaluate(formula, leftSample, rightSample);
         ComparisonResult comparisonResultMWW = comparisonEvaluatorMWW.evaluate(formula, leftSample, rightSample);
         ComparisonResult comparisonResultKS = comparisonEvaluatorKS.evaluate(formula, leftSample, rightSample);
-        result = new ComparisonEvaluationResult(formula, comparisonResult, comparisonResultMWW , comparisonResultKS, 
+        result = new ComparisonEvaluationResult(formula, comparisonResultT, comparisonResultMWW , comparisonResultKS, 
             leftSample, rightSample);
         outputProvider.generateComparisonOutput(result);
         releaseDataOnSamples(leftSample, rightSample);

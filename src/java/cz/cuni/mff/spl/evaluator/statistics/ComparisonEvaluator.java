@@ -7,12 +7,13 @@ import cz.cuni.mff.spl.annotation.MeasurementState.LastPhase;
 import cz.cuni.mff.spl.annotation.Sign;
 import cz.cuni.mff.spl.configuration.SplEvaluatorConfiguration;
 import cz.cuni.mff.spl.evaluator.output.results.ComparisonResult;
+import cz.cuni.mff.spl.evaluator.input.MeasurementDataProvider.MeasurementDataNotFoundException;
 
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues;
 
 
-public class ComparisonEvaluator {
+public abstract class ComparisonEvaluator {
 
     
     /** The confidence to be used for p-value comparison. */
@@ -76,7 +77,16 @@ public class ComparisonEvaluator {
                 StatisticalSummary rightSummary = transformStatisticalSummary(rightMeasurementSample.getStatisticalSummary(),
                         getLambdaMultiplier(comparison.getRightLambda()));
 
-                return processComparison(comparison, leftSummary, rightSummary, comparison.getSign());
+
+                double[] leftMeasurement = transformMeasuredArray(leftMeasurementSample, getLambdaMultiplier(comparison.getLeftLambda()));
+                double[] rightMeasurement = transformMeasuredArray(rightMeasurementSample, getLambdaMultiplier(comparison.getRightLambda()));
+
+                double leftMedian = transformMedianValue(leftMeasurementSample.getMedian(), getLambdaMultiplier(comparison.getLeftLambda()));
+                double rightMedian = transformMedianValue(rightMeasurementSample.getMedian(), getLambdaMultiplier(comparison.getRightLambda()));
+                
+
+                return processComparison(comparison,leftMeasurement, rightMeasurement, leftSummary, rightSummary,
+                    leftMedian, rightMedian, comparison.getSign());
             } else {
                 String errorMessage;
 
@@ -154,6 +164,14 @@ public class ComparisonEvaluator {
             return ComparisonResult.createNotComputedComparisonResult(errorMessage);
         }
     }
+
+    public abstract ComparisonResult processComparison(Comparison comparison, 
+                double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
+                StatisticalSummary measuredData2, double median1, double median2, Sign comparisonType);
+
+    public abstract ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
+                double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
+                StatisticalSummary measuredData2, double median1, double median2);
 
        /**
      * Transforms the statistical summary with provided lambda multiplier.
