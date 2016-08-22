@@ -28,7 +28,7 @@ public class EmpiricalDistribution{
 		int max = (int)a[n-1];
 		int range = max - min;
 		if (n < 100){
-			binCount = range;
+			binCount = 200;
 		}
 		double binSize = range/(double)binCount;
 		ArrayList<ArrayList<Double>> output = new ArrayList<ArrayList<Double>>();
