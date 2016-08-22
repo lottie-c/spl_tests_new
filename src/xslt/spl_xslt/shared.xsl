@@ -389,24 +389,24 @@
 		<li class="comparison">
 			<xsl:if test="$COMPARISON_EVAL_RESULT">
 				<xsl:variable name="statisticalResult"
-					select="$COMPARISON_EVAL_RESULT/comparison-result/@result" />
+					select="$COMPARISON_EVAL_RESULT/comparison-result-T/@result" />
 				<xsl:choose>
 					<xsl:when test="$statisticalResult eq 'OK'">
 						<xsl:call-template name="IMAGE.ok">
 							<xsl:with-param name="TOOLTIP"
-								select="concat('t-test p-value: ', $COMPARISON_EVAL_RESULT/comparison-result/@pValue)" />
+								select="concat('t-test p-value: ', $COMPARISON_EVAL_RESULT/comparison-result-T/@pValue)" />
 						</xsl:call-template>
 					</xsl:when>
 					<xsl:when test="$statisticalResult eq 'FAILED'">
 						<xsl:call-template name="IMAGE.failed">
 							<xsl:with-param name="TOOLTIP"
-								select="concat('t-test p-value: ', $COMPARISON_EVAL_RESULT/comparison-result/@pValue)" />
+								select="concat('t-test p-value: ', $COMPARISON_EVAL_RESULT/comparison-result-T/@pValue)" />
 						</xsl:call-template>
 					</xsl:when>
 					<xsl:when test="$statisticalResult eq 'NOT_COMPUTED'">
 						<xsl:call-template name="IMAGE.unknown">
 							<xsl:with-param name="TOOLTIP"
-								select="$COMPARISON_EVAL_RESULT/comparison-result/error-message" />
+								select="$COMPARISON_EVAL_RESULT/comparison-result-T/error-message" />
 						</xsl:call-template>
 					</xsl:when>
 					<xsl:otherwise>

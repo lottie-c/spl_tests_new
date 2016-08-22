@@ -77,9 +77,9 @@
 				<div class="section">
 					<h2 class="error">Comparison result was not computed</h2>
 					<xsl:choose>
-						<xsl:when test="$comparisonResult/comparison-result/error-message">
+						<xsl:when test="$comparisonResult/comparison-result-T/error-message">
 							<xsl:for-each
-								select="tokenize($comparisonResult/comparison-result/error-message, '\n')">
+								select="tokenize($comparisonResult/comparison-result-T/error-message, '\n')">
 								<p>
 									<xsl:value-of select="." />
 								</p>
@@ -122,7 +122,7 @@
 							<xsl:with-param name="VALUE">
 								<xsl:call-template name="PRINTER.format.pvalue">
 									<xsl:with-param name="VALUE"
-										select="$comparisonResult/comparison-result/@pValue" />
+										select="$comparisonResult/comparison-result-T/@pValue" />
 								</xsl:call-template>
 							</xsl:with-param>
 							<xsl:with-param name="VALID" select="$isSatisfied" />
