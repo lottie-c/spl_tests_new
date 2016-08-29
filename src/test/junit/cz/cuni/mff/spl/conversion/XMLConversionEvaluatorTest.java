@@ -91,8 +91,8 @@ public class XMLConversionEvaluatorTest {
         data.setMean(11);
         data.setMedian(12);
         data.setSampleCount(13);
-        data.setStandardDeviation(14);
-        data.setVariance(15);
+        data.setStandardDeviation(4);
+        data.setVariance(16);
 
         MeasurementSample sample = new MeasurementSample();
         sample.setStatisticalData(data);

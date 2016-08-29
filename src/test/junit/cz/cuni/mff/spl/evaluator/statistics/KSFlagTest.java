@@ -5,8 +5,8 @@ import static org.junit.Assert.assertFalse;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.util.Scanner;
+//import java.io.File;
+//import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,10 +57,7 @@ public class KSFlagTest{
 						2.776125, 4.976497, 2.931005, 2.642703, 5.199425,
 						2.064087, 2.842258, 3.243002, 3.976528, 3.61147};
 
-	
-	/*want to test
-		same dist gives  p-value 1
-		KSFlag gives same p_value as ks test*/
+
 	
 	@Test
 	public void testKSFlag(){	

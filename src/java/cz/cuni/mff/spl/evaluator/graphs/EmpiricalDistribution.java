@@ -22,6 +22,15 @@ public class EmpiricalDistribution{
 	*/
 	public ArrayList<ArrayList<Double>> load(double[] a){
 
+		if ((a == null)||(a.length == 0)){
+			ArrayList<ArrayList<Double>> output = new ArrayList<ArrayList<Double>>();
+			ArrayList<Double> firstEntry = new ArrayList<Double>();
+			firstEntry.add(0D);
+			firstEntry.add(0D);
+			output.add(firstEntry);
+			return output;
+		}
+
 		int n = a.length;
 		Arrays.sort(a);
 		int min = (int)a[0];
@@ -30,6 +39,10 @@ public class EmpiricalDistribution{
 		if (n < 100){
 			binCount = 200;
 		}
+		if (range < 100){
+			binCount = range;
+		}
+
 		double binSize = range/(double)binCount;
 		ArrayList<ArrayList<Double>> output = new ArrayList<ArrayList<Double>>();
 
