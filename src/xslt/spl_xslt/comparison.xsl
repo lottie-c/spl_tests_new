@@ -139,7 +139,7 @@
 					</table>
 
 					<h3>Mann Whitney Wilcoxon Test</h3>
-					<p> The Mann Whitney Wilcoxon test compares the medians of the two sample distributions. This test should be more accurate when dealing with non-normal distributions, especially when sample size is low.</p>
+					<p> The Mann Whitney Wilcoxon test compares the medians of two population. This test should be more accurate when dealing with non-normal distributions, especially when sample size is low.</p>
 					<table class="comparison-statistical-data statistical-data">	
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
@@ -168,7 +168,7 @@
 						</xsl:call-template>
 					</table>
 					<h3>Kolmogorov Smirnov Test</h3>
-					<p> The Kolmogorov Smirnov Test, tests whether two distributions are equal, it is useful for testing whether the performance of one test is better than another over the whole distribution, see the EDF graph below.</p>
+					<p> The Kolmogorov Smirnov Test, tests whether two distributions are equal, it is useful for testing whether the performance of one test is better than another over the whole distribution, see the Empirical Distribution graph below.</p>
 					<table class="comparison-statistical-data statistical-data">
 						<xsl:call-template name="PRINTER.tableRow">
 							<xsl:with-param name="KEY"
