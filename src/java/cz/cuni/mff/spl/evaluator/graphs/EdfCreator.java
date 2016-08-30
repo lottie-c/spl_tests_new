@@ -103,7 +103,7 @@ public class EdfCreator {
         PlotOrientation orientation = PlotOrientation.VERTICAL;
         boolean toolTips = false;
         boolean urls = false;
-        final JFreeChart chart = ChartFactory.createXYLineChart(plotTitle, xaxisTitle,
+        final JFreeChart chart = ChartFactory.createXYStepChart(plotTitle, xaxisTitle,
                 yaxisTitle, dataset, orientation, showLegend, toolTips, urls);
 
         if (plotSubtitle != null && !plotSubtitle.isEmpty()) {

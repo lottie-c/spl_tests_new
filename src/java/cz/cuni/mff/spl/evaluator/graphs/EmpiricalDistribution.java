@@ -68,23 +68,12 @@ public class EmpiricalDistribution{
 		//function, y coordinates - output(i,0), x coordinates - output(i,1)
 		for (int i = 0; i < counts.length; i++){
 			//if no data points in bin, line is flat, no step
-			if (counts[i] == 0){
-				ArrayList<Double> entry = new ArrayList<Double>();
-				entry.add(current);
-				entry.add(Double.valueOf(i*binSize + min));
-				output.add(entry);
-			}else{
-				// add a plot point before the step
-				ArrayList<Double> entry = new ArrayList<Double>();
-				entry.add(current);
-				entry.add(Double.valueOf(i*binSize + min));
-				output.add(entry);
-				// add a plot point after the step
+			if (counts[i] != 0){
 				current += counts[i]*inc;
-				ArrayList<Double> entry2 = new ArrayList<Double>();
-				entry2.add(current);
-				entry2.add(Double.valueOf(i*binSize + min));
-				output.add(entry2);
+				ArrayList<Double> entry = new ArrayList<Double>();
+				entry.add(current);
+				entry.add(Double.valueOf(i*binSize + min));
+				output.add(entry);
 
 			}
 
