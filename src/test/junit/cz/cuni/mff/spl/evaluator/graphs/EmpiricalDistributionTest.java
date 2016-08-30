@@ -25,45 +25,27 @@ public class EmpiricalDistributionTest{
 		entry1.add(0.0);
 		extra.add(entry1);
 
+
 		ArrayList<Double> entry2 = new ArrayList<Double>();
-		entry2.add(0.0);
+		entry2.add(0.25);
 		entry2.add(1.0);
 		extra.add(entry2);
 
 		ArrayList<Double> entry3 = new ArrayList<Double>();
-		entry3.add(0.25);
-		entry3.add(1.0);
+		entry3.add(0.5);
+		entry3.add(2.0);
 		extra.add(entry3);
 
 		ArrayList<Double> entry4 = new ArrayList<Double>();
-		entry4.add(0.25);
-		entry4.add(2.0);
+		entry4.add(0.75);
+		entry4.add(3.0);
 		extra.add(entry4);
 
 		ArrayList<Double> entry5 = new ArrayList<Double>();
-		entry5.add(0.5);
-		entry5.add(2.0);
+		entry5.add(1.0);
+		entry5.add(4.0);
 		extra.add(entry5);
 
-		ArrayList<Double> entry6 = new ArrayList<Double>();
-		entry6.add(0.5);
-		entry6.add(3.0);
-		extra.add(entry6);
-
-		ArrayList<Double> entry7 = new ArrayList<Double>();
-		entry7.add(0.75);
-		entry7.add(3.0);
-		extra.add(entry7);
-
-		ArrayList<Double> entry8 = new ArrayList<Double>();
-		entry8.add(0.75);
-		entry8.add(4.0);
-		extra.add(entry8);
-
-		ArrayList<Double> entry9 = new ArrayList<Double>();
-		entry9.add(1.0);
-		entry9.add(4.0);
-		extra.add(entry9);
 
 		output = extra;
 
