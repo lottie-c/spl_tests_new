@@ -104,7 +104,7 @@ public class EdfCreator {
         boolean toolTips = false;
         boolean urls = false;
         final JFreeChart chart = ChartFactory.createXYStepChart(plotTitle, xaxisTitle,
-                yaxisTitle, dataset, orientation, showLegend, toolTips, urls);
+                yaxisTitle, dataset,false, orientation, showLegend, toolTips, urls);
 
         if (plotSubtitle != null && !plotSubtitle.isEmpty()) {
             chart.addSubtitle(new TextTitle(plotSubtitle));
