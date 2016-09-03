@@ -196,8 +196,7 @@ public class EdfCreator {
                             max = clippedData[i];
                         }
                     }
-                    int numBins = clippedData.length/10;
-                    EmpiricalDistribution dist = new EmpiricalDistribution(numBins);
+                    EmpiricalDistribution dist = new EmpiricalDistribution();
                     ArrayList<ArrayList<Double>> output = dist.load(clippedData);
                     data.add(new EdfSeries(sample.getSpecification(), output, min));
                 } catch (MeasurementDataNotFoundException e) {

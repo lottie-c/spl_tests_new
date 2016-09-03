@@ -59,14 +59,12 @@ public class EmpiricalDistributionTest{
 	/**/
 	@Test
 	public void testLoad(){
-		EmpiricalDistribution dist = new EmpiricalDistribution(4);
+		EmpiricalDistribution dist = new EmpiricalDistribution();
 		
 		double[] a = null;
 
 		assertEquals(output, dist.load(input));
-
-		
-		assertEquals(empty, dist.load(a));
+		assertEquals("null input array should output (0,0)", empty, dist.load(a));
 
 	}
 }
