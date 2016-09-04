@@ -113,6 +113,7 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
             case LE: {
                 ComparisonResult lt = processComparison(comparison, measuredData1, measuredData2, Sign.LT);
                 ComparisonResult eq = processComparison(comparison, measuredData1, measuredData2, Sign.EQ);
+                
                 if (lt.isSatisfied() && eq.isSatisfied()) {
                     return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
                 } else if (lt.isSatisfied()) {
@@ -189,7 +190,7 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
         ComparisonResult lowerResult = processComparison(comparison, leftLowerSummary, rightLowerSummary, Sign.LE);
         ComparisonResult greaterResult = processComparison(comparison, leftGreaterSummary, rightGreaterSummary, Sign.GE);
 
-        // combine results if satisfied, or return the one that failed
+       // combine results if satisfied, or return the one that failed
         if (lowerResult.isSatisfied() && greaterResult.isSatisfied()) {
             return new ComparisonResult(Math.min(lowerResult.getPValue(), greaterResult.getPValue()), true);
         } else if (lowerResult.isSatisfied()) {

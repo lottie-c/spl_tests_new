@@ -120,7 +120,6 @@ public class ComparisonEvaluatorMWW extends ComparisonEvaluator {
                     dataArray1, dataArray2, Sign.LT);
                 ComparisonResult eq = processComparison(comparison, median1, median2, 
                     dataArray1, dataArray2, Sign.EQ);
-		 System.out.println("MWWTEST: \n" + "lt.pValue = " +lt.getPValue() + "\n eq.pValue = " + eq.getPValue() );
                 if (lt.isSatisfied() && eq.isSatisfied()) {
                     return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
                 } else if (lt.isSatisfied()) {

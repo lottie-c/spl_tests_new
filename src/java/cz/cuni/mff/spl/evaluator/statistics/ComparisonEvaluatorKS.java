@@ -122,7 +122,6 @@ public class ComparisonEvaluatorKS extends ComparisonEvaluator{
 	   
 	    ComparisonResult eq = processComparison(comparison,
 						    dataArray1, dataArray2, Sign.EQ);
-	    System.out.println("KSTEST: \n" + "lt.pValue = " +lt.getPValue() + "\n eq.pValue = " + eq.getPValue() );
 	    if (lt.isSatisfied() && eq.isSatisfied()) {
 		return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
 	    } else if (lt.isSatisfied()) {
