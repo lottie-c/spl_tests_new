@@ -41,9 +41,9 @@ import cz.cuni.mff.spl.evaluator.input.MeasurementDataProvider.MeasurementDataNo
 
 
 /**
- * Processes comparison evaluation.
+ * Processes comparison evaluation for Mann Whitney U test.
  * 
- * @author Martin Lacina
+ * @author Lottie Carruthers
  * 
  */
 public class ComparisonEvaluatorMWW extends ComparisonEvaluator {
@@ -86,6 +86,16 @@ public class ComparisonEvaluatorMWW extends ComparisonEvaluator {
              double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
              StatisticalSummary measuredData2, double median1, double median2, Sign comparisonType) {
 
+	return(processComparison( comparison, median1, median2,
+				  dataArray1, dataArray2,  comparisonType));
+
+       
+    }
+
+
+     private ComparisonResult processComparison(Comparison comparison, double median1, double median2,
+             double[] dataArray1, double[] dataArray2, Sign comparisonType) {
+
         if (dataArray1.length < 2 || dataArray2.length < 2) {
             return ComparisonResult.createNotComputedComparisonResult("Not enough measurement samples for statistical Mann Whitney Wilcoxon test.");
         }
@@ -94,22 +104,22 @@ public class ComparisonEvaluatorMWW extends ComparisonEvaluator {
             case EQI:
                 // this is the most complex case as we need to evaluate equality
                 // with interval check
-                return processIntervalEqualityComparison(comparison, dataArray2, dataArray1,
-                     measuredData2, measuredData1, median2, median1);
+                return processIntervalEqualityComparison(comparison, median2, 
+                	median1, dataArray2, dataArray1);
 
             case GE:
                 // just swap values and test for LE
-                return processComparison(comparison, dataArray2, dataArray1,
-                     measuredData2, measuredData1, median2, median1, Sign.LE);
+                return processComparison(comparison, median2, median1,
+                 dataArray2, dataArray1, Sign.LE);
             case GT:
                 // just swap values and test for LT
-                return processComparison(comparison, dataArray2, dataArray1,
-                     measuredData2, measuredData1, median2, median1, Sign.LT);
+                return processComparison(comparison, median2, median1, 
+                    dataArray2, dataArray1, Sign.LT);
             case LE: {
-                ComparisonResult lt = processComparison(comparison, dataArray1, dataArray2,
-                     measuredData1, measuredData2, median1, median2, Sign.LT);
-                ComparisonResult eq = processComparison(comparison, dataArray1, dataArray2,
-                     measuredData1, measuredData2, median1, median2, Sign.EQ);
+                ComparisonResult lt = processComparison(comparison, median1, median2, 
+                    dataArray1, dataArray2, Sign.LT);
+                ComparisonResult eq = processComparison(comparison, median1, median2, 
+                    dataArray1, dataArray2, Sign.EQ);
                 if (lt.isSatisfied() && eq.isSatisfied()) {
                     return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
                 } else if (lt.isSatisfied()) {
@@ -141,6 +151,8 @@ public class ComparisonEvaluatorMWW extends ComparisonEvaluator {
         }
     }
 
+
+
     /**
      * Process interval equality comparison.
      * 
@@ -155,8 +167,17 @@ public class ComparisonEvaluatorMWW extends ComparisonEvaluator {
      * @return The comparison result.
      */
     public ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
-             double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
-             StatisticalSummary measuredData2, double median1, double median2) {
+             double[] dataArray2, double[] dataArray1, StatisticalSummary measuredData2, 
+             StatisticalSummary measuredData1, double median2, double median1) {
+
+	return (processIntervalEqualityComparison( comparison,  median2, median1, dataArray2,
+						   dataArray1));
+
+
+    }
+
+    private ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
+         double median2, double median1, double[] dataArray2, double[] dataArray1) {
 
         Double interval = comparison.getInterval();
         interval = interval != null ? interval : configuration.getEqualityInterval();
@@ -173,10 +194,10 @@ public class ComparisonEvaluatorMWW extends ComparisonEvaluator {
         double[] leftGreaterMeasurement = transformMeasuredArray(dataArray1, 1.0d + interval);
         double[] rightGreaterMeasurement = transformMeasuredArray(dataArray2, 1.0d - interval);
 
-        ComparisonResult lowerResult = processComparison(comparison, leftLowerMeasurement, rightLowerMeasurement,
-            measuredData1, measuredData2, leftLowerMedian, rightLowerMedian, Sign.LE);
-        ComparisonResult greaterResult = processComparison(comparison, leftGreaterMeasurement, 
-            rightGreaterMeasurement,  measuredData1, measuredData2, leftGreaterMedian, rightGreaterMedian, Sign.GE);
+        ComparisonResult lowerResult = processComparison(comparison, leftLowerMedian, rightLowerMedian,
+							 leftLowerMeasurement, rightLowerMeasurement,  Sign.LE);
+        ComparisonResult greaterResult = processComparison(comparison, leftGreaterMedian, rightGreaterMedian,
+							   leftGreaterMeasurement, rightGreaterMeasurement, Sign.GE);
 
         // combine results if satisfied, or return the one that failed
         if (lowerResult.isSatisfied() && greaterResult.isSatisfied()) {
@@ -187,4 +208,6 @@ public class ComparisonEvaluatorMWW extends ComparisonEvaluator {
             return lowerResult;
         }
     }
+
+    
 }

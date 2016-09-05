@@ -170,8 +170,8 @@ public abstract class ComparisonEvaluator {
                 StatisticalSummary measuredData2, double median1, double median2, Sign comparisonType);
 
     public abstract ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
-                double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
-                StatisticalSummary measuredData2, double median1, double median2);
+                double[] dataArray2, double[] dataArray1, StatisticalSummary measuredData2, 
+                StatisticalSummary measuredData1, double median2, double median1);
 
        /**
      * Transforms the statistical summary with provided lambda multiplier.

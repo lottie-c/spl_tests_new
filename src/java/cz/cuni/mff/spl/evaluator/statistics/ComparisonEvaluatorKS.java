@@ -42,7 +42,7 @@ import cz.cuni.mff.spl.evaluator.input.MeasurementDataProvider.MeasurementDataNo
 
 
 /**
- * Processes comparison evaluation.
+ * Processes comparison evaluation for Kolmogorov Smirnov Test.
  * 
  * @author Martin Lacina
  * 
@@ -88,62 +88,72 @@ public class ComparisonEvaluatorKS extends ComparisonEvaluator{
              double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
              StatisticalSummary measuredData2, double median1, double median2, Sign comparisonType) {
 
+	return (processComparison (comparison, dataArray1,
+				  dataArray2, comparisonType));
+
+    }
+
+
+    private ComparisonResult processComparison(Comparison comparison, double[] dataArray1,
+					       double[] dataArray2, Sign comparisonType) {
+
         if (dataArray1.length < 2 || dataArray2.length < 2) {
             return ComparisonResult.createNotComputedComparisonResult("Not enough measurement samples for statistical Mann Whitney Wilcoxon test.");
         }
 
         switch (comparisonType) {
-            case EQI:
-                // this is the most complex case as we need to evaluate equality
-                // with interval check
-                return processIntervalEqualityComparison(comparison, dataArray2, dataArray1,
-                     measuredData2, measuredData1, median2, median1);
+	case EQI:
+	    // this is the most complex case as we need to evaluate equality
+	    // with interval check
+	    return processIntervalEqualityComparison(comparison,
+						     dataArray2, dataArray1);
 
-            case GE:
-                // just swap values and test for LE
-                return processComparison(comparison, dataArray2, dataArray1,
-                     measuredData2, measuredData1, median2, median1, Sign.LE);
-            case GT:
-                // just swap values and test for LT
-                return processComparison(comparison, dataArray2, dataArray1,
-                     measuredData2, measuredData1, median2, median1, Sign.LT);
-            case LE: {
-                ComparisonResult lt = processComparison(comparison, dataArray1, dataArray2,
-                     measuredData1, measuredData2, median1, median2, Sign.LT);
-                ComparisonResult eq = processComparison(comparison, dataArray1, dataArray2,
-                     measuredData1, measuredData2, median1, median2, Sign.EQ);
-                if (lt.isSatisfied() && eq.isSatisfied()) {
-                    return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
-                } else if (lt.isSatisfied()) {
-                    return lt;
-                } else {
-                    return eq;
-                }
-            }
-            case LT:
+	case GE:
+	    // just swap values and test for LE
+	    return processComparison(comparison,
+				     dataArray2, dataArray1, Sign.LE);
+	case GT:
+	    // just swap values and test for LT
+	    return processComparison(comparison, 
+				     dataArray2, dataArray1, Sign.LT);
+	case LE: {
+	    ComparisonResult lt = processComparison(comparison, 
+						    dataArray1, dataArray2, Sign.LT);
+	   
+	    ComparisonResult eq = processComparison(comparison,
+						    dataArray1, dataArray2, Sign.EQ);
+	    if (lt.isSatisfied() && eq.isSatisfied()) {
+		return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
+	    } else if (lt.isSatisfied()) {
+		return lt;
+	    } else {
+		return eq;
+	    }
+	}
+	case LT:
                 
-                // need to divide answer by 2 for a one sided test
-                // first need to check that the test statistic is not in upper tail
-                //kolmogorovSmirnovTestFlag returns double[2], first element is pValue
-                // when second elemnet  = 0 the difference calculated in the KS test is 
-                // positive, else it is negative
-                double testPValue = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2);
-                if(KSTEST.getNegFlag() == 0){
-                    double pValueNegate = testPValue / 2.0;
-                    // KS test validation says, that both series means are equal
-                    // but we don't want this result, we want negation
-                    boolean result = !confidenceChecker.isPvalueAcceptable(pValueNegate);
-                    return new ComparisonResult(pValueNegate, result);
-                }else{
-                    return new ComparisonResult(0, false);
-                }
+	    // need to divide answer by 2 for a one sided test
+	    // first need to check that the test statistic is not in upper tail
+	    //kolmogorovSmirnovTestFlag returns double[2], first element is pValue
+	    // when second elemnet  = 0 the difference calculated in the KS test is 
+	    // positive, else it is negative
+	    double testPValue = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2);
+	    if(KSTEST.getNegFlag() == 0){
+		double pValueNegate = testPValue / 2.0;
+		// KS test validation says, that both series means are equal
+		// but we don't want this result, we want negation
+		boolean result = !confidenceChecker.isPvalueAcceptable(pValueNegate);
+		return new ComparisonResult(pValueNegate, result);
+	    }else{
+		return new ComparisonResult(0, false);
+	    }
 
-            case EQ:
-                double pValue = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2);
-                boolean acceptable = confidenceChecker.isPvalueAcceptable(pValue);
-                return new ComparisonResult(pValue, acceptable);
-            default:
-                throw new IllegalStateException("Unexpected switch value " + comparisonType.toString());
+	case EQ:
+	    double pValue = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2);
+	    boolean acceptable = confidenceChecker.isPvalueAcceptable(pValue);
+	    return new ComparisonResult(pValue, acceptable);
+	default:
+	    throw new IllegalStateException("Unexpected switch value " + comparisonType.toString());
         }
     }
 
@@ -161,9 +171,18 @@ public class ComparisonEvaluatorKS extends ComparisonEvaluator{
      *            The confidence checker.
      * @return The comparison result.
      */
-    public ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
-             double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
-             StatisticalSummary measuredData2, double median1, double median2) {
+public ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
+             double[] dataArray2, double[] dataArray1, StatisticalSummary measuredData2, 
+             StatisticalSummary measuredData1, double median2, double median1) {
+
+    return(processIntervalEqualityComparison(comparison, 
+         dataArray2, dataArray1));
+
+    }
+
+
+private ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
+        double[] dataArray2, double[] dataArray1) {
 
         Double interval = comparison.getInterval();
         interval = interval != null ? interval : configuration.getEqualityInterval();
@@ -175,11 +194,9 @@ public class ComparisonEvaluatorKS extends ComparisonEvaluator{
         double[] rightGreaterMeasurement = transformMeasuredArray(dataArray2, 1.0d - interval);
 
         ComparisonResult lowerResult = processComparison(comparison,
-            leftLowerMeasurement, rightLowerMeasurement, measuredData1, measuredData2, 
-            median1, median2,  Sign.LE);
+            leftLowerMeasurement, rightLowerMeasurement,  Sign.LE);
         ComparisonResult greaterResult = processComparison(comparison,
-            leftGreaterMeasurement, rightGreaterMeasurement, measuredData1, measuredData2, 
-            median1, median2, Sign.GE);
+            leftGreaterMeasurement, rightGreaterMeasurement, Sign.GE);
 
         // combine results if satisfied, or return the one that failed
         if (lowerResult.isSatisfied() && greaterResult.isSatisfied()) {
