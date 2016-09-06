@@ -171,6 +171,7 @@ public class KolmogorovSmirnovTestFlag {
         this.rng = rng;
     }
 
+    /*Returns the value of negFlag*/
     public int getNegFlag(){
         return negFlag;
     }
@@ -279,6 +280,13 @@ public class KolmogorovSmirnovTestFlag {
         return approximateP(kolmogorovSmirnovStatistic(x, y), x.length, y.length);
     }
 
+    /* Computes the p-value for a two sided Kolmogorov Smirnov test, testing the null
+       hypothesis that x and y are samples from the same distribution. 
+       The test statistic used is derived from the greatest difference between the 
+       empirical distribution of each sample. This method returns the pValue but also 
+       sets the attribute negFlag to 0 if the largest difference is positive, and 1 if
+       it is negative. 
+    */
     public double kolmogorovSmirnovTestFlag(double[] x, double[] y, boolean strict) {
         final long lengthProduct = (long) x.length * y.length;
         double[] xa = null;
@@ -417,6 +425,13 @@ public class KolmogorovSmirnovTestFlag {
         return supD;
     }
 
+    /*
+        Calcultes the two sample kolmogorov smirnov test statistic - 
+        the greatest difference between the two sample's empirical
+        distribution formulae. If this difference is positive 
+        the attribute negFlag is set to 0, if the difference is negative
+        negFlag is set to 1.
+    */
     private long integralKolmogorovSmirnovStatistic(double[] x, double[] y) {
         checkArray(x);
         checkArray(y);

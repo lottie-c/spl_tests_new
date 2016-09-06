@@ -1,30 +1,4 @@
-/*
- * Copyright (c) 2012, František Haas, Martin Lacina, Jaroslav Kotrč, Jiří Daniel
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the author nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- */
+
 package cz.cuni.mff.spl.evaluator.statistics;
 
 import org.apache.commons.math3.stat.inference.KolmogorovSmirnovTest;
@@ -44,12 +18,12 @@ import cz.cuni.mff.spl.evaluator.input.MeasurementDataProvider.MeasurementDataNo
 /**
  * Processes comparison evaluation for Kolmogorov Smirnov Test.
  * 
- * @author Martin Lacina
+ * @author Lottie Carruthers
  * 
  */
 public class ComparisonEvaluatorKS extends ComparisonEvaluator{
 
-    /** The TTest singleton instance to be used. */
+    /** The KolmogorovSmirnovTestFlag singleton instance to be used. */
     private static final KolmogorovSmirnovTestFlag            
         KSTEST = new KolmogorovSmirnovTestFlag();
 
@@ -66,8 +40,40 @@ public class ComparisonEvaluatorKS extends ComparisonEvaluator{
     }
 
    
+
+
     /**
-     * Processes comparison of samples.
+     * Calls the comparison processor for this class, ommitting extra
+     * parameters
+     *
+     * @param comparison
+     *            The comparison.
+     * @param dataArray1
+     *            The left measurement sample.
+     * @param dataArray2
+     *            The right measurement sample.
+     * @param  measuredData1
+     *            The statistical summary of the left measurement.
+     * @param measuredData2
+     *            The statistical summary of the right measurement.
+     * @param median1 
+     *            The median of the left measurement
+     * @param median2 
+     *            The median of the right measurement
+     * @param comparisonType
+     *            The comparison type.
+     * @return The comparison result.
+     */
+    public ComparisonResult processComparison(Comparison comparison, 
+             double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
+             StatisticalSummary measuredData2, double median1, double median2, Sign comparisonType) {
+
+    	return (processComparison (comparison, dataArray1,
+    				  dataArray2, comparisonType));
+    }
+
+    /**
+     * Processes comparison of samples using a Kolmogorov Smirnov test.
      * 
      * @param comparison
      *            The comparison.
@@ -81,19 +87,8 @@ public class ComparisonEvaluatorKS extends ComparisonEvaluator{
      *            The comparison type.
      * @return The comparison result with result and p-value.
      * @see ComparisonResult
-     * @see MannWhitneyUTest#MannWhitneyUTest(double[], double[])
+     * @see KolmogorovSmirnovTestFlag#kolmogorovSmirnovTestFlag(double[], double[])
      */
-
-    public ComparisonResult processComparison(Comparison comparison, 
-             double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
-             StatisticalSummary measuredData2, double median1, double median2, Sign comparisonType) {
-
-	return (processComparison (comparison, dataArray1,
-				  dataArray2, comparisonType));
-
-    }
-
-
     private ComparisonResult processComparison(Comparison comparison, double[] dataArray1,
 					       double[] dataArray2, Sign comparisonType) {
 
@@ -102,64 +97,96 @@ public class ComparisonEvaluatorKS extends ComparisonEvaluator{
         }
 
         switch (comparisonType) {
-	case EQI:
-	    // this is the most complex case as we need to evaluate equality
-	    // with interval check
-	    return processIntervalEqualityComparison(comparison,
-						     dataArray2, dataArray1);
+        	case EQI:
+        	    // this is the most complex case as we need to evaluate equality
+        	    // with interval check
+        	    return processIntervalEqualityComparison(comparison,
+        						     dataArray2, dataArray1);
 
-	case GE:
-	    // just swap values and test for LE
-	    return processComparison(comparison,
-				     dataArray2, dataArray1, Sign.LE);
-	case GT:
-	    // just swap values and test for LT
-	    return processComparison(comparison, 
-				     dataArray2, dataArray1, Sign.LT);
-	case LE: {
-	    ComparisonResult lt = processComparison(comparison, 
-						    dataArray1, dataArray2, Sign.LT);
-	   
-	    ComparisonResult eq = processComparison(comparison,
-						    dataArray1, dataArray2, Sign.EQ);
-	    if (lt.isSatisfied() && eq.isSatisfied()) {
-		return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
-	    } else if (lt.isSatisfied()) {
-		return lt;
-	    } else {
-		return eq;
-	    }
-	}
-	case LT:
-                
-	    // need to divide answer by 2 for a one sided test
-	    // first need to check that the test statistic is not in upper tail
-	    //kolmogorovSmirnovTestFlag returns double[2], first element is pValue
-	    // when second elemnet  = 0 the difference calculated in the KS test is 
-	    // positive, else it is negative
-	    double testPValue = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2);
-	    if(KSTEST.getNegFlag() == 0){
-		double pValueNegate = testPValue / 2.0;
-		// KS test validation says, that both series means are equal
-		// but we don't want this result, we want negation
-		boolean result = !confidenceChecker.isPvalueAcceptable(pValueNegate);
-		return new ComparisonResult(pValueNegate, result);
-	    }else{
-		return new ComparisonResult(0, false);
-	    }
+        	case GE:
+        	    // just swap values and test for LE
+        	    return processComparison(comparison,
+        				     dataArray2, dataArray1, Sign.LE);
+        	case GT:
+        	    // just swap values and test for LT
+        	    return processComparison(comparison, 
+        				     dataArray2, dataArray1, Sign.LT);
+        	case LE: {
+        	    ComparisonResult lt = processComparison(comparison, 
+        						    dataArray1, dataArray2, Sign.LT);
+        	   
+        	    ComparisonResult eq = processComparison(comparison,
+        						    dataArray1, dataArray2, Sign.EQ);
+        	    if (lt.isSatisfied() && eq.isSatisfied()) {
+        		return new ComparisonResult(Math.max(lt.getPValue(), eq.getPValue()), true);
+        	    } else if (lt.isSatisfied()) {
+        		return lt;
+        	    } else {
+        		return eq;
+        	    }
+        	}
+        	case LT:
+                        
+        	    // need to divide answer by 2 for a one sided test
+        	    // first need to check that the test statistic is not in upper tail
+        	    //kolmogorovSmirnovTestFlag returns double[2], first element is pValue
+        	    // when second elemnet  = 0 the difference calculated in the KS test is 
+        	    // positive, else it is negative
+        	    double testPValue = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2);
+        	    if(KSTEST.getNegFlag() == 0){
+            		double pValueNegate = testPValue / 2.0;
+            		// KS test validation says, that both series means are equal
+            		// but we don't want this result, we want negation
+            		boolean result = !confidenceChecker.isPvalueAcceptable(pValueNegate);
+            		return new ComparisonResult(pValueNegate, result);
+        	    }else{
+        		  return new ComparisonResult(0, false);
+        	    }
 
-	case EQ:
-	    double pValue = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2);
-	    boolean acceptable = confidenceChecker.isPvalueAcceptable(pValue);
-	    return new ComparisonResult(pValue, acceptable);
-	default:
-	    throw new IllegalStateException("Unexpected switch value " + comparisonType.toString());
+        	case EQ:
+        	    double pValue = KSTEST.kolmogorovSmirnovTestFlag(dataArray1, dataArray2);
+        	    boolean acceptable = confidenceChecker.isPvalueAcceptable(pValue);
+        	    return new ComparisonResult(pValue, acceptable);
+        	default:
+        	    throw new IllegalStateException("Unexpected switch value " + comparisonType.toString());
         }
     }
 
 
+   
+
     /**
-     * Process interval equality comparison.
+     * Calls the  equality processor for this class, ommitting extra
+     * parameters
+     *
+     * @param comparison
+     *            The comparison.
+     * @param dataArray1
+     *            The left measurement sample.
+     * @param dataArray2
+     *            The right measurement sample.
+     * @param  measuredData1
+     *            The statistical summary of the left measurement.
+     * @param measuredData2
+     *            The statistical summary of the right measurement.
+     * @param median1 
+     *            The median of the left measurement
+     * @param median2 
+     *            The median of the right measurement
+     * @param comparisonType
+     *            The comparison type.
+     * @return The comparison result.
+     */
+    public ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
+                 double[] dataArray2, double[] dataArray1, StatisticalSummary measuredData2, 
+                 StatisticalSummary measuredData1, double median2, double median1) {
+
+        return(processIntervalEqualityComparison(comparison, 
+             dataArray2, dataArray1));
+    }
+
+     /**
+     * Process interval equality comparison using a Kolmogorov Smirnov Test.
      * 
      * @param comparison
      *            The comparison.
@@ -167,21 +194,9 @@ public class ComparisonEvaluatorKS extends ComparisonEvaluator{
      *            The measured data2.
      * @param measuredData1
      *            The measured data1.
-     * @param confidenceChecker
-     *            The confidence checker.
      * @return The comparison result.
      */
-public ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
-             double[] dataArray2, double[] dataArray1, StatisticalSummary measuredData2, 
-             StatisticalSummary measuredData1, double median2, double median1) {
-
-    return(processIntervalEqualityComparison(comparison, 
-         dataArray2, dataArray1));
-
-    }
-
-
-private ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
+    private ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
         double[] dataArray2, double[] dataArray1) {
 
         Double interval = comparison.getInterval();

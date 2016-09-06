@@ -1,5 +1,4 @@
 package cz.cuni.mff.spl.evaluator.statistics;
-
 import cz.cuni.mff.spl.annotation.Comparison;
 import cz.cuni.mff.spl.annotation.Lambda;
 import cz.cuni.mff.spl.annotation.MeasurementState;
@@ -12,7 +11,7 @@ import cz.cuni.mff.spl.evaluator.input.MeasurementDataProvider.MeasurementDataNo
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues;
 
-
+/*Provides methods and data used by subclasses to evaluate comparisons*/ 
 public abstract class ComparisonEvaluator {
 
     
@@ -165,10 +164,55 @@ public abstract class ComparisonEvaluator {
         }
     }
 
+
+
+    /**
+     * An abstract method which is over written in each subclass with the correct implementation
+     * for processing comparisons 
+     *
+     * @param comparison
+     *            The comparison.
+     * @param dataArray1
+     *            The left measurement sample.
+     * @param dataArray2
+     *            The right measurement sample.
+     * @param  measuredData1
+     *            The statistical summary of the left measurement.
+     * @param measuredData2
+     *            The statistical summary of the right measurement.
+     * @param median1 
+     *            The median of the left measurement
+     * @param median2 
+     *            The median of the right measurement
+     * @param comparisonType
+     *            The comparison type.
+     * @return The comparison result.
+     */
     public abstract ComparisonResult processComparison(Comparison comparison, 
                 double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
                 StatisticalSummary measuredData2, double median1, double median2, Sign comparisonType);
 
+
+    /**
+     * An abstract method which is over written in each subclass with the correct implementation
+     * for processing equality comparisons 
+     *
+     * @param comparison
+     *            The comparison.
+     * @param dataArray1
+     *            The left measurement sample.
+     * @param dataArray2
+     *            The right measurement sample.
+     * @param  measuredData1
+     *            The statistical summary of the left measurement.
+     * @param measuredData2
+     *            The statistical summary of the right measurement.
+     * @param median1 
+     *            The median of the left measurement
+     * @param median2 
+     *            The median of the right measurement
+     * @return The comparison result.
+     */
     public abstract ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
                 double[] dataArray2, double[] dataArray1, StatisticalSummary measuredData2, 
                 StatisticalSummary measuredData1, double median2, double median1);
@@ -209,7 +253,7 @@ public abstract class ComparisonEvaluator {
     }
 
 
-       /**
+    /**
      * Transforms the measured array with the provided lambda multiplier.
      * Returned array is original measurement sample data multiplied by 
      * lambda multiplier
@@ -250,6 +294,16 @@ public abstract class ComparisonEvaluator {
         return array;
     }
 
+    /**
+     * Transforms the input median with the provided lambda multiplier.
+     * Returned value is original median  multiplied by the
+     * lambda multiplier
+     * @param median
+     *       the median to transform
+     * @param lambdaMultipler
+     *      The lambda multiplier.
+     * @return The transformed median.
+     */
      public static double transformMedianValue(double median, double lambdaMultiplier){
     	return median*lambdaMultiplier;
     }

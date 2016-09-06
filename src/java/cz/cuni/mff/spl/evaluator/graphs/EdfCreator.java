@@ -62,17 +62,10 @@ public class EdfCreator {
 
 
     /**
-     * Instantiates a new histogram graph creator.
-     * <p>
-     * Provided minimum and maximum values can be swapped, i. e. higher will be
-     * used for maximum and lower for minimum.
-     * 
+     * Instantiates a new empirical distribution graph creator.
      * @param graphUtils
      *            The graph utilities to use.
-     * @param minHistogramBinCount
-     *            The minimum histogram bin count.
-     * @param maxHistogramBinCount
-     *            The maximum histogram bin count.
+     * 
      */
     public EdfCreator(GraphUtils graphUtils) {
         this.graphUtils = graphUtils;
@@ -116,7 +109,10 @@ public class EdfCreator {
     }
 
 
-     private XYDataset createDataset( List<EdfSeries> data){
+    /*
+       aggregate the data set to be displayed in the graph
+    */
+    private XYDataset createDataset( List<EdfSeries> data){
         final XYSeriesCollection dataset = new XYSeriesCollection( );  
         for (EdfSeries oneData : data) {
             XYSeries dataSeries = new XYSeries(oneData.title);
@@ -127,8 +123,6 @@ public class EdfCreator {
             }
             dataset.addSeries(dataSeries);
         }
-
-        
         return dataset;
      }
 
@@ -147,11 +141,13 @@ public class EdfCreator {
         public final double min;
 
         /**
-         * Instantiates a new histogram series.
+         * Instantiates a new Edf series.
          * 
          * @param title
          *            The series title.
          * @param data
+         *            The series data.
+         * @param min
          *            The series data.
          */
         public EdfSeries(String title, ArrayList<ArrayList<Double>> data, double min) {
@@ -164,7 +160,7 @@ public class EdfCreator {
     
 
     /**
-     * Creates the histogram.
+     * Creates the Edf Graph.
      * 
      * @param definition
      *            The definition.
@@ -225,25 +221,14 @@ public class EdfCreator {
 
 
     /**
-     * Creates the quantile clipped histogram.
+     * Creates the empirical distribution comparison graph as PNG image.
      * 
-     * @param sampleData
+     * @param samples
      *            The sample data.
-     * @param lowerClip
-     *            The lower clip. In percent, i. e. value in interval [0.0,
-     *            100.0].
-     * @param upperClip
-     *            The upper clip. In percent, i. e. value in interval [0.0,
-     *            100.0].
-     * @return PNG encoded image as byte array, or {@code null} when encoding
-     *         error occurs.
+     * @return PNG encoded image as byte array, or {@code null} when error
+     *         occurs.
      * @throws MeasurementDataNotFoundException
-     *             Thrown when measurement sample sample data were not found.
-     * @throws IllegalArgumentException
-     *             When provided clip values are outside of range [0.0, 100.0]
-     *             or when lower clip is higher than upper clip.
-     * 
-     * @see DataClipper#quantileClip(MeasurementSample, double, double)
+     *             Thrown when measurement sample data were not found.
      */
     public byte[] createEdfPNG(GraphDefinition definition, MeasurementSampleDescriptor... sampleData) throws MeasurementDataNotFoundException {
         return graphUtils.chartToPNG(createEdfGraph(definition, sampleData));

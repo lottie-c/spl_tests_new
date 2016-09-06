@@ -56,7 +56,7 @@ public class EmpiricalDistributionTest{
 
 	}
 
-	/**/
+	/*Test the load function for EmpricalDistribution*/
 	@Test
 	public void testLoad(){
 		EmpiricalDistribution dist = new EmpiricalDistribution();

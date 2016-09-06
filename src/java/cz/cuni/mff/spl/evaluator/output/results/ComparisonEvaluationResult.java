@@ -36,6 +36,9 @@ import cz.cuni.mff.spl.evaluator.statistics.MeasurementSample;
  * @author Martin Lacina
  * 
  */
+/*Edited by Lottie Carruthers*/
+
+/*Stores the results of evaluating comparison using a variety of tests*/
 public class ComparisonEvaluationResult extends AbstractEvaluationResult {
 
     /** The comparison. */
@@ -185,7 +188,7 @@ public class ComparisonEvaluationResult extends AbstractEvaluationResult {
     }
 
     /**
-     * Sets the comparison result.
+     * Sets the t test comparison result.
      * 
      * For XML transformation only.
      * 

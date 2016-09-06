@@ -59,6 +59,7 @@ import cz.cuni.mff.spl.evaluator.statistics.StatisticValueChecker;
  * @author Martin Lacina
  * 
  */
+/*Edited by Lottie Carruthers*/
 class EvaluatorImpl {
 
     /** The sample provider. */

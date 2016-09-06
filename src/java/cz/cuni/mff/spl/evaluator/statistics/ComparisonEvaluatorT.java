@@ -1,30 +1,4 @@
-/*
- * Copyright (c) 2012, František Haas, Martin Lacina, Jaroslav Kotrč, Jiří Daniel
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the author nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- */
+
 package cz.cuni.mff.spl.evaluator.statistics;
 
 
@@ -41,9 +15,9 @@ import cz.cuni.mff.spl.configuration.SplEvaluatorConfiguration;
 import cz.cuni.mff.spl.evaluator.output.results.ComparisonResult;
 
 /**
- * Processes comparison evaluation.
+ * Processes comparison evaluation using a TTest.
  * 
- * @author Martin Lacina
+ * @author Lottie Carruthers
  * 
  */
 public class ComparisonEvaluatorT extends ComparisonEvaluator {
@@ -63,8 +37,17 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
 	super(configuration, checker);
     }
 
+
+    public ComparisonResult processComparison(Comparison comparison, 
+             double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
+             StatisticalSummary measuredData2, double median1, double median2, Sign comparisonType) {
+	
+    	return(processComparison( comparison,  measuredData1,  measuredData2,
+    				  comparisonType));
+    }
+
     /**
-     * Processes comparison of samples.
+     * Processes comparison of samples using a TTest.
      * 
      * @param comparison
      *            The comparison.
@@ -81,16 +64,6 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
      * @see TTest#tTest(StatisticalSummary, StatisticalSummary)
      * @see TTest#tTest(StatisticalSummary, StatisticalSummary, double)
      */
-    public ComparisonResult processComparison(Comparison comparison, 
-             double[] dataArray1, double[] dataArray2, StatisticalSummary measuredData1, 
-             StatisticalSummary measuredData2, double median1, double median2, Sign comparisonType) {
-	
-	return(processComparison( comparison,  measuredData1,  measuredData2,
-				  comparisonType));
-
-    }
-
-
     private ComparisonResult processComparison(Comparison comparison, StatisticalSummary measuredData1, StatisticalSummary measuredData2,
             Sign comparisonType) {
 
@@ -155,7 +128,37 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
 
 
     /**
-     * Process interval equality comparison.
+     * Calls the  equality processor for this class, ommitting extra
+     * parameters
+     *
+     * @param comparison
+     *            The comparison.
+     * @param dataArray1
+     *            The left measurement sample.
+     * @param dataArray2
+     *            The right measurement sample.
+     * @param  measuredData1
+     *            The statistical summary of the left measurement.
+     * @param measuredData2
+     *            The statistical summary of the right measurement.
+     * @param median1 
+     *            The median of the left measurement
+     * @param median2 
+     *            The median of the right measurement
+     * @param comparisonType
+     *            The comparison type.
+     * @return The comparison result.
+     */
+    public ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
+             double[] dataArray2, double[] dataArray1, StatisticalSummary measuredData2, 
+             StatisticalSummary measuredData1, double median2, double median1) {
+
+	   return( processIntervalEqualityComparison( comparison,  measuredData2,  measuredData1));
+    }
+
+
+    /**
+     * Process interval equality comparison using a TTest.
      * 
      * @param comparison
      *            The comparison.
@@ -167,15 +170,6 @@ public class ComparisonEvaluatorT extends ComparisonEvaluator {
      *            The confidence checker.
      * @return The comparison result.
      */
-    public ComparisonResult processIntervalEqualityComparison(Comparison comparison, 
-             double[] dataArray2, double[] dataArray1, StatisticalSummary measuredData2, 
-             StatisticalSummary measuredData1, double median2, double median1) {
-
-	return( processIntervalEqualityComparison( comparison,  measuredData2,  measuredData1));
-
-    }
-
-
     private ComparisonResult processIntervalEqualityComparison(Comparison comparison, StatisticalSummary measuredData2, StatisticalSummary measuredData1) {
 
         Double interval = comparison.getInterval();

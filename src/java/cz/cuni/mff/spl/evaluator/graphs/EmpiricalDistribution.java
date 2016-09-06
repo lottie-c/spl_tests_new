@@ -3,14 +3,25 @@ package cz.cuni.mff.spl.evaluator.graphs;
 import java.util.Arrays;
 import java.util.ArrayList;
 
+
+/*
+  Calculates the emperical distribution of a sample
+  Written by Lottie Carruthers
+*/
 public class EmpiricalDistribution{
 
 	public EmpiricalDistribution(){
 	}
 
-	
+	/* calculates the empirical distribution of a sample, 
+	   input is the sample, a double array. The output is 
+	   an nx2 ArrayList	where each pair give the edf with 
+	   the cumulative probability on the left and the 
+	   value on the right. The coordinates are in the 
+	   format (y,x) for a step function.
+	*/	
 	public ArrayList<ArrayList<Double>> load(double[] a){
-
+		//if a is empty return (0,0)
 		if ((a == null)||(a.length == 0)){
 			ArrayList<ArrayList<Double>> output = new ArrayList<ArrayList<Double>>();
 			ArrayList<Double> firstEntry = new ArrayList<Double>();
@@ -50,7 +61,7 @@ public class EmpiricalDistribution{
 				entry.add(Double.valueOf(a[i]));
 				output.add(entry);
 			}
-
+			//if this is the second last element, add the last
 			if(i == a.length - 2){
 				current += inc;
 				ArrayList<Double> entry = new ArrayList<Double>();
